@@ -21,9 +21,6 @@ namespace vsgImGui
 
             void record(vsg::CommandBuffer& commandBuffer) const override;
 
-            void setShowDemoWindow(bool);
-            bool getShowDemoWindow() const;
-
         private:
             virtual ~GuiCommand();
 
@@ -34,7 +31,6 @@ namespace vsgImGui
             VkDescriptorPool _descriptorPool;
             VkCommandPool _commandPool;
             RenderCallback _renderCallback;
-            bool           _showDemoWindow = false;
 
             void _init( const vsg::ref_ptr<vsg::Window> &window );
             void _uploadFonts( const vsg::ref_ptr<vsg::Window> &window );

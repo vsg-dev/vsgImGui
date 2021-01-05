@@ -58,6 +58,9 @@ class MyRenderCallback
                     _params.showSecondWindow = false;
                 ImGui::End();
             }
+
+            if( _params.showDemoWindow )
+                ImGui::ShowDemoWindow(&_params.showDemoWindow);
         }
 
 
@@ -181,10 +184,6 @@ int main(int argc, char** argv)
         while (viewer->advanceToNextFrame() )
         {
             viewer->handleEvents();
-
-            {
-                gui->setShowDemoWindow( params.showDemoWindow );
-            }
 
             viewer->update();
 

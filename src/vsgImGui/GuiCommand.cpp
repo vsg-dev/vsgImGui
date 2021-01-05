@@ -33,17 +33,6 @@ GuiCommand::~GuiCommand()
     vkDestroyCommandPool(_device, _commandPool, nullptr);
 }
 
-void GuiCommand::setShowDemoWindow( bool flag)
-{
-    _showDemoWindow = flag;
-}
-
-bool GuiCommand::getShowDemoWindow() const
-{
-    return _showDemoWindow;
-}
-
-
 void GuiCommand::setRenderCallback( const RenderCallback &callback )
 {
     _renderCallback = callback;
@@ -51,16 +40,11 @@ void GuiCommand::setRenderCallback( const RenderCallback &callback )
 
 void GuiCommand::render() const
 {
-    bool pOpen = false;
-
     ImGui_ImplVulkan_NewFrame();
     ImGui::NewFrame();
 
     if( _renderCallback )
         _renderCallback();
-
-    if( _showDemoWindow )
-        ImGui::ShowDemoWindow(&pOpen);
 
     ImGui::Render();
 }
