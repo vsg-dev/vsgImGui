@@ -77,7 +77,6 @@ execute_process( COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_SOURCE_DIR}/i
 if (compare_result EQUAL 0)
 else()
     file(COPY ${CMAKE_SOURCE_DIR}/src/imgui/imgui.h DESTINATION ${CMAKE_SOURCE_DIR}/include/vsgImGui/)
-    file(COPY ${CMAKE_SOURCE_DIR}/src/imgui/imconfig.h DESTINATION ${CMAKE_SOURCE_DIR}/include/vsgImGui/)
     message("copied imgui.h")
 endif()
 
