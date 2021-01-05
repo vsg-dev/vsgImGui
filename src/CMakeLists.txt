@@ -82,7 +82,7 @@ write_basic_package_version_file("${CMAKE_BINARY_DIR}/src/vsgImGuiConfigVersion.
 
 configure_file("${CMAKE_SOURCE_DIR}/src/vsgImGuiConfig.cmake.in" "${CMAKE_BINARY_DIR}/src/vsgImGuiConfig.cmake" @ONLY)
 
-install(FILES "${CMAKE_BINARY_DIR}/src/vsgImGuiConfig.cmake" "${CMAKE_BINARY_DIR}//vsgImGuiConfigVersion.cmake"
+install(FILES "${CMAKE_BINARY_DIR}/src/vsgImGuiConfig.cmake" "${CMAKE_BINARY_DIR}/src/vsgImGuiConfigVersion.cmake"
     DESTINATION lib/cmake/vsgImGui
 )
 
