@@ -158,9 +158,6 @@ int main(int argc, char** argv)
         auto gui = vsgImGui::GuiCommand::create(window);
         renderGraph->addChild(gui);
 
-        std::cout<<"gui = "<<gui<<std::endl;
-        std::cout<<"options->readerWriter = "<<options->readerWriter<<std::endl;
-
         Params params;
         gui->setRenderCallback( MyRenderCallback( params ) );
         // ***************************************
