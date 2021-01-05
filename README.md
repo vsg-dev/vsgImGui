@@ -2,7 +2,7 @@
 Library that intergrates VulkanSceneGraph with ImGui
 
 
-# Checking out vsgImGui
+## Checking out vsgImGui
 
     git clone --recurse-submodules https://github.com/robertosfield/vsgImGui.git
 
@@ -12,12 +12,12 @@ or
     git submodules init
 
 
-# Building vsgImGui
+## Building vsgImGui
 
     cd vsgImGui
     cmake .
     make -j 8
 
-# Running example
+## Running example
 
     bin/vsgimgui
