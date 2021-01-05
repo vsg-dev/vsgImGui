@@ -20,4 +20,4 @@ or
 
 ## Running example
 
-    bin/vsgimgui
+    bin/vsgimgui model.vsgt
