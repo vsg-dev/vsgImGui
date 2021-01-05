@@ -1,5 +1,5 @@
 #include <vsgImGui/GuiCommand.h>
-#include <vsgImGui/VSGImGuiEventHandler.h>
+#include <vsgImGui/GuiEventHandler.h>
 #include <vsgImGui/imgui.h>
 
 #include <vsg/all.h>
@@ -166,7 +166,7 @@ int main(int argc, char** argv)
         // ***************************************
 
         // ********** Add the ImGui event handler first to handle events early  **************
-        viewer->addEventHandler(vsgImGui::VSGImGuiEventHandler::create(gui));
+        viewer->addEventHandler(vsgImGui::GuiEventHandler::create(gui));
         // ***************************************
 
         // add close handler to respond the close window button and pressing escape

@@ -7,10 +7,10 @@
 
 namespace vsgImGui
 {
-    class VSGIMGUI_DECLSPEC VSGImGuiEventHandler : public vsg::Inherit<vsg::Visitor, VSGImGuiEventHandler>
+    class VSGIMGUI_DECLSPEC GuiEventHandler : public vsg::Inherit<vsg::Visitor, GuiEventHandler>
     {
         public:
-            VSGImGuiEventHandler(vsg::ref_ptr<GuiCommand> vsgImgui);
+            GuiEventHandler(vsg::ref_ptr<GuiCommand> vsgImgui);
 
             void apply(vsg::ButtonPressEvent& buttonPress) override;
             void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
@@ -22,7 +22,7 @@ namespace vsgImGui
             void apply(vsg::FrameEvent& frame) override;
 
         private:
-            ~VSGImGuiEventHandler();
+            ~GuiEventHandler();
 
             uint32_t _convertButton( uint32_t button );
             std::chrono::high_resolution_clock::time_point t0;
@@ -36,4 +36,4 @@ namespace vsgImGui
     };
 }
 
-EVSG_type_name(vsgImGui::VSGImGuiEventHandler);
+EVSG_type_name(vsgImGui::GuiEventHandler);

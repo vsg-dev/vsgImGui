@@ -1,4 +1,4 @@
-#include <vsgImGui/VSGImGuiEventHandler.h>
+#include <vsgImGui/GuiEventHandler.h>
 #include <vsgImGui/imgui.h>
 
 using namespace vsgImGui;
@@ -79,7 +79,7 @@ static int ConvertFromOSGKey(uint16_t key)
   return 0;
 }
 
-VSGImGuiEventHandler::VSGImGuiEventHandler(vsg::ref_ptr<GuiCommand> vsgImgui) :
+GuiEventHandler::GuiEventHandler(vsg::ref_ptr<GuiCommand> vsgImgui) :
     _vsgImgui(vsgImgui),
     _dragging(false)
 {
@@ -88,10 +88,10 @@ VSGImGuiEventHandler::VSGImGuiEventHandler(vsg::ref_ptr<GuiCommand> vsgImgui) :
     initKeymap();
 }
 
-VSGImGuiEventHandler::~VSGImGuiEventHandler()
+GuiEventHandler::~GuiEventHandler()
 {}
 
-void VSGImGuiEventHandler::apply(vsg::ButtonPressEvent& buttonPress)
+void GuiEventHandler::apply(vsg::ButtonPressEvent& buttonPress)
 {
     ImGuiIO &io = ImGui::GetIO();
 
@@ -111,7 +111,7 @@ void VSGImGuiEventHandler::apply(vsg::ButtonPressEvent& buttonPress)
 
 }
 
-void VSGImGuiEventHandler::initKeymap()
+void GuiEventHandler::initKeymap()
 {
 
   ImGuiIO& io = ImGui::GetIO();
@@ -140,7 +140,7 @@ void VSGImGuiEventHandler::initKeymap()
   io.KeyMap[ImGuiKey_Z]          = vsg::KeySymbol::KEY_Z;
 }
 
-void VSGImGuiEventHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
+void GuiEventHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
 {
     ImGuiIO &io = ImGui::GetIO();
     if( (!_dragging) && io.WantCaptureMouse )
@@ -156,7 +156,7 @@ void VSGImGuiEventHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
     _dragging = false;
 }
 
-void VSGImGuiEventHandler::apply(vsg::MoveEvent& moveEvent)
+void GuiEventHandler::apply(vsg::MoveEvent& moveEvent)
 {
     if ( !_dragging )
     {
@@ -168,7 +168,7 @@ void VSGImGuiEventHandler::apply(vsg::MoveEvent& moveEvent)
     }
 }
 
-void VSGImGuiEventHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
+void GuiEventHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
 {
     if ( !_dragging )
     {
@@ -178,7 +178,7 @@ void VSGImGuiEventHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
     }
 }
 
-void VSGImGuiEventHandler::apply(vsg::KeyPressEvent& keyPress)
+void GuiEventHandler::apply(vsg::KeyPressEvent& keyPress)
 {
     ImGuiIO &io = ImGui::GetIO();
 
@@ -212,7 +212,7 @@ void VSGImGuiEventHandler::apply(vsg::KeyPressEvent& keyPress)
     }
 }
 
-void VSGImGuiEventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
+void GuiEventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     ImGuiIO &io = ImGui::GetIO();
 
@@ -241,14 +241,14 @@ void VSGImGuiEventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
     }
 }
 
-void VSGImGuiEventHandler::apply(vsg::ConfigureWindowEvent& configureWindow)
+void GuiEventHandler::apply(vsg::ConfigureWindowEvent& configureWindow)
 {
     ImGuiIO &io = ImGui::GetIO();
     io.DisplaySize.x = configureWindow.width;
     io.DisplaySize.y = configureWindow.height;
 }
 
-void VSGImGuiEventHandler::apply(vsg::FrameEvent& /*frame*/)
+void GuiEventHandler::apply(vsg::FrameEvent& /*frame*/)
 {
     ImGuiIO &io = ImGui::GetIO();
 
@@ -262,7 +262,7 @@ void VSGImGuiEventHandler::apply(vsg::FrameEvent& /*frame*/)
 }
 
 
-uint32_t VSGImGuiEventHandler::_convertButton( uint32_t button )
+uint32_t GuiEventHandler::_convertButton( uint32_t button )
 {
     return button == 1 ? 0 : button == 3 ? 1 : button;
 }
