@@ -1,8 +1,10 @@
-#include <vsgImGui/VSGImGui.h>
+#include <vsgImGui/GuiCommand.h>
 
 #include "../imgui/backends/imgui_impl_vulkan.h"
 
 #include <iostream>
+
+using namespace vsgImGui;
 
 namespace
 {
@@ -17,13 +19,13 @@ namespace
     }
 }
 
-vsgImGui::vsgImGui( const vsg::ref_ptr<vsg::Window> &window )
+GuiCommand::GuiCommand( const vsg::ref_ptr<vsg::Window> &window )
 {
     _init(window);
     _uploadFonts(window);
 }
 
-vsgImGui::~vsgImGui()
+GuiCommand::~GuiCommand()
 {
     ImGui_ImplVulkan_Shutdown();
     ImGui::DestroyContext();
@@ -31,23 +33,23 @@ vsgImGui::~vsgImGui()
     vkDestroyCommandPool(_device, _commandPool, nullptr);
 }
 
-void vsgImGui::setShowDemoWindow( bool flag)
+void GuiCommand::setShowDemoWindow( bool flag)
 {
     _showDemoWindow = flag;
 }
 
-bool vsgImGui::getShowDemoWindow() const
+bool GuiCommand::getShowDemoWindow() const
 {
     return _showDemoWindow;
 }
 
 
-void vsgImGui::setRenderCallback( const RenderCallback &callback )
+void GuiCommand::setRenderCallback( const RenderCallback &callback )
 {
     _renderCallback = callback;
 }
 
-void vsgImGui::render() const
+void GuiCommand::render() const
 {
     bool pOpen = false;
 
@@ -63,7 +65,7 @@ void vsgImGui::render() const
     ImGui::Render();
 }
 
-void vsgImGui::record(vsg::CommandBuffer& commandBuffer) const
+void GuiCommand::record(vsg::CommandBuffer& commandBuffer) const
 {
     // render();
 
@@ -72,7 +74,7 @@ void vsgImGui::record(vsg::CommandBuffer& commandBuffer) const
         ImGui_ImplVulkan_RenderDrawData(draw_data, &(*commandBuffer));
 }
 
-void vsgImGui::_init( const vsg::ref_ptr<vsg::Window> &window )
+void GuiCommand::_init( const vsg::ref_ptr<vsg::Window> &window )
 {
     VkResult err;
     IMGUI_CHECKVERSION();
@@ -137,7 +139,7 @@ void vsgImGui::_init( const vsg::ref_ptr<vsg::Window> &window )
     ImGui_ImplVulkan_Init(&init_info, *window->getOrCreateRenderPass());
 }
 
-void vsgImGui::_uploadFonts( const vsg::ref_ptr<vsg::Window> &window )
+void GuiCommand::_uploadFonts( const vsg::ref_ptr<vsg::Window> &window )
 {
     VkResult err;
 

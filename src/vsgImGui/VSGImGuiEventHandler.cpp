@@ -1,6 +1,8 @@
 #include <vsgImGui/VSGImGuiEventHandler.h>
 #include <vsgImGui/imgui.h>
 
+using namespace vsgImGui;
+
 //////////////////////////////////////////////////////////////////////////////
 // Imporant Note: Dear ImGui expects the control Keys indices not to be	    //
 // greater thant 511. It actually uses an array of 512 elements. However,   //
@@ -77,7 +79,7 @@ static int ConvertFromOSGKey(uint16_t key)
   return 0;
 }
 
-VSGImGuiEventHandler::VSGImGuiEventHandler(vsg::ref_ptr<vsgImGui> vsgImgui) :
+VSGImGuiEventHandler::VSGImGuiEventHandler(vsg::ref_ptr<GuiCommand> vsgImgui) :
     _vsgImgui(vsgImgui),
     _dragging(false)
 {

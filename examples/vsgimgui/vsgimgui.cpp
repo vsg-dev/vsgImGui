@@ -1,4 +1,4 @@
-#include <vsgImGui/VSGImGui.h>
+#include <vsgImGui/GuiCommand.h>
 #include <vsgImGui/VSGImGuiEventHandler.h>
 #include <vsgImGui/imgui.h>
 
@@ -155,15 +155,18 @@ int main(int argc, char** argv)
 
 
         // ********** Create the ImGui node and add it to the renderGraph  ************
-        auto gui = vsgImGui::create(window);
+        auto gui = vsgImGui::GuiCommand::create(window);
         renderGraph->addChild(gui);
+
+        std::cout<<"gui = "<<gui<<std::endl;
+        std::cout<<"options->readerWriter = "<<options->readerWriter<<std::endl;
 
         Params params;
         gui->setRenderCallback( MyRenderCallback( params ) );
         // ***************************************
 
         // ********** Add the ImGui event handler first to handle events early  **************
-        viewer->addEventHandler(VSGImGuiEventHandler::create(gui));
+        viewer->addEventHandler(vsgImGui::VSGImGuiEventHandler::create(gui));
         // ***************************************
 
         // add close handler to respond the close window button and pressing escape
