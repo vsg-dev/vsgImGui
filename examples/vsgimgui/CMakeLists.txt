@@ -23,6 +23,11 @@ target_link_libraries(vsgimgui
     vsg::vsg
 )
 
+if (vsgXchange_FOUND)
+    target_compile_definitions(vsgimgui PRIVATE USE_VSGXCHANGE)
+    target_link_libraries(vsgimgui vsgXchange::vsgXchange)
+endif()
+
 install(TARGETS vsgimgui
         RUNTIME DESTINATION bin
 )

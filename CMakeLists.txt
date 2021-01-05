@@ -73,6 +73,9 @@ endif()
 find_package(Vulkan REQUIRED)
 find_package(vsg REQUIRED)
 
+# find the optional vsgXchange that can be used for reading and range of image and 3d model formats and shader compilation
+find_package(vsgXchange QUIET)
+
 execute_process( COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_SOURCE_DIR}/include/vsgImGui/imgui.h ${CMAKE_SOURCE_DIR}/src/imgui/imgui.h RESULT_VARIABLE compare_result)
 if (compare_result EQUAL 0)
 else()

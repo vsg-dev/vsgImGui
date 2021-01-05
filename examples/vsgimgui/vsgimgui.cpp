@@ -4,6 +4,10 @@
 
 #include <vsg/all.h>
 
+#ifdef USE_VSGXCHANGE
+#include <vsgXchange/ReaderWriter_all.h>
+#endif
+
 struct Params
 {
     bool showGui = true;         // you can toggle this with your own EventHandler and key
@@ -65,6 +69,10 @@ int main(int argc, char** argv)
 {
     // set up defaults and read command line arguments to override them
     auto options = vsg::Options::create();
+#ifdef USE_VSGXCHANGE
+    // add use of vsgXchange's support for reading and writing 3rd party file formats
+    options->readerWriter = vsgXchange::ReaderWriter_all::create();
+#endif
 
     auto windowTraits = vsg::WindowTraits::create();
     windowTraits->windowTitle = "vsgviewer";
@@ -85,13 +93,14 @@ int main(int argc, char** argv)
     {
         auto vsg_scene = vsg::Group::create();
 
-        auto nodeTx = vsg::MatrixTransform::create();
-        if (auto node = vsg::read_cast<vsg::Node>("teapot.vsgt"); node) 
+        if (argc>1)
         {
-            nodeTx->addChild( node );
-            vsg_scene->addChild(nodeTx);
+            vsg::Path filename = arguments[1];
+            if (auto node = vsg::read_cast<vsg::Node>(filename, options); node)
+            {
+                vsg_scene->addChild(node);
+            }
         }
-
 
         // create the viewer and assign window(s) to it
         auto viewer = vsg::Viewer::create();
@@ -115,8 +124,7 @@ int main(int argc, char** argv)
         double nearFarRatio = 0.01;
 
         // set up the camera
-        //auto lookAt = vsg::LookAt::create(centre+vsg::dvec3(0.0, -radius*3.5, 0.0), centre, vsg::dvec3(0.0, 0.0, 1.0));
-        auto lookAt = vsg::LookAt::create(centre+vsg::dvec3(0.0, 0.0, radius*3.5), centre, vsg::dvec3(0.0, 1.0, 0.0));
+        auto lookAt = vsg::LookAt::create(centre+vsg::dvec3(0.0, -radius*3.5, 0.0), centre, vsg::dvec3(0.0, 0.0, 1.0));
 
         vsg::ref_ptr<vsg::ProjectionMatrix> perspective;
         if (vsg::ref_ptr<vsg::EllipsoidModel> ellipsoidModel(vsg_scene->getObject<vsg::EllipsoidModel>("EllipsoidModel")); ellipsoidModel)
@@ -176,11 +184,6 @@ int main(int argc, char** argv)
 
             {
                 gui->setShowDemoWindow( params.showDemoWindow );
-
-                vsg::dmat4 M;
-                camera->getViewMatrix()->get(M);
-                vsg::dmat4 Mi = vsg::inverse(M);
-                nodeTx->setMatrix( Mi * vsg::translate( 0.0, 0.0, params.dist * -100.0 )  * M );
             }
 
             viewer->update();
