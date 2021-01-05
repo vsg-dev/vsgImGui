@@ -93,6 +93,6 @@ add_custom_target(uninstall
 
 # source directory for main vsgXchange library
 add_subdirectory(src)
-add_subdirectory(applications/vsgimgui)
+add_subdirectory(examples/vsgimgui)
 
 
