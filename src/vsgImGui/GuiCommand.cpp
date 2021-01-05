@@ -33,18 +33,20 @@ GuiCommand::~GuiCommand()
     vkDestroyCommandPool(_device, _commandPool, nullptr);
 }
 
-void GuiCommand::setRenderCallback( const RenderCallback &callback )
+void GuiCommand::add(const Component& component)
 {
-    _renderCallback = callback;
+    _components.push_back(component);
 }
 
-void GuiCommand::render() const
+void GuiCommand::renderComponents() const
 {
     ImGui_ImplVulkan_NewFrame();
     ImGui::NewFrame();
 
-    if( _renderCallback )
-        _renderCallback();
+    for(auto& component : _components)
+    {
+        component();
+    }
 
     ImGui::Render();
 }

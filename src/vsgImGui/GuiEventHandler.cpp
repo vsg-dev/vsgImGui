@@ -258,7 +258,7 @@ void GuiEventHandler::apply(vsg::FrameEvent& /*frame*/)
 
     io.DeltaTime = dt;
 
-    _vsgImgui->render();
+    _vsgImgui->renderComponents();
 }
 
 

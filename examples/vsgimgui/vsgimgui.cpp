@@ -18,10 +18,10 @@ struct Params
     float dist = 0.f;
 };
 
-class MyRenderCallback
+class MyGuiComponent
 {
     public:
-        MyRenderCallback( Params &params ):
+        MyGuiComponent( Params &params ):
             _params(params)
         {}
 
@@ -162,7 +162,7 @@ int main(int argc, char** argv)
         renderGraph->addChild(gui);
 
         Params params;
-        gui->setRenderCallback( MyRenderCallback( params ) );
+        gui->add( MyGuiComponent( params ) );
         // ***************************************
 
         // ********** Add the ImGui event handler first to handle events early  **************
