@@ -1,2 +1,2 @@
 # vsgImGui
-Integrration of VulkanSceneGraph with ImGui
+Library that intergrates VulkanSceneGraph with ImGui
