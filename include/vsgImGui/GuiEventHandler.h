@@ -30,8 +30,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 namespace vsgImGui
 {
-    class VSGIMGUI_DECLSPEC GuiEventHandler
-        : public vsg::Inherit<vsg::Visitor, GuiEventHandler>
+    class VSGIMGUI_DECLSPEC GuiEventHandler : public vsg::Inherit<vsg::Visitor, GuiEventHandler>
     {
     public:
         GuiEventHandler();

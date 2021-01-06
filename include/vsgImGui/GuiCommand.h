@@ -32,8 +32,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 namespace vsgImGui
 {
 
-    class VSGIMGUI_DECLSPEC GuiCommand
-        : public vsg::Inherit<vsg::Command, GuiCommand>
+    class VSGIMGUI_DECLSPEC GuiCommand : public vsg::Inherit<vsg::Command, GuiCommand>
     {
     public:
         GuiCommand(const vsg::ref_ptr<vsg::Window>& window);
