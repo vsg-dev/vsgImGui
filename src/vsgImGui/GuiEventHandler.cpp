@@ -91,8 +91,7 @@ static int ConvertFromOSGKey(uint16_t key)
   return 0;
 }
 
-GuiEventHandler::GuiEventHandler(vsg::ref_ptr<GuiCommand> vsgImgui) :
-    _vsgImgui(vsgImgui),
+GuiEventHandler::GuiEventHandler() :
     _dragging(false)
 {
     t0 = std::chrono::high_resolution_clock::now();
@@ -269,8 +268,6 @@ void GuiEventHandler::apply(vsg::FrameEvent& /*frame*/)
     t0 = t1;
 
     io.DeltaTime = dt;
-
-    _vsgImgui->renderComponents();
 }
 
 
@@ -278,4 +275,3 @@ uint32_t GuiEventHandler::_convertButton( uint32_t button )
 {
     return button == 1 ? 0 : button == 3 ? 1 : button;
 }
-

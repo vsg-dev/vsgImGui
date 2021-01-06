@@ -65,7 +65,7 @@ void GuiCommand::renderComponents() const
 
 void GuiCommand::record(vsg::CommandBuffer& commandBuffer) const
 {
-    // render();
+    renderComponents();
 
     ImDrawData* draw_data = ImGui::GetDrawData();
     if( draw_data )
