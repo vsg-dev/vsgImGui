@@ -24,6 +24,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <vsgImGui/GuiEventHandler.h>
 #include <vsgImGui/imgui.h>
 
+#include <vsg/ui/KeyEvent.h>
+#include <vsg/ui/PointerEvent.h>
+#include <vsg/ui/ScrollWheelEvent.h>
+
 using namespace vsgImGui;
 
 //////////////////////////////////////////////////////////////////////////////
