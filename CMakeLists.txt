@@ -93,5 +93,15 @@ add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/build/uninstall.cmake
 )
 
+# add clang-foramt build target to enforce a standard code style guide.
+find_program(CLANGFORMAT clang-format)
+if (CLANGFORMAT)
+    add_custom_target(clang-format
+        COMMAND ${CLANGFORMAT} -i ${PATH_TO_SOURCE}include/vsgImGui/GuiCommand.h ${PATH_TO_SOURCE}include/vsgImGui/GuiEventHandler.h  ${PATH_TO_SOURCE}include/vsgImGui/Export.h ${PATH_TO_SOURCE}src/vsgImGui/*.cpp
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Automated code format using clang-format"
+    )
+endif()
+
 # source directory for main vsgXchange library
 add_subdirectory(src)
