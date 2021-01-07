@@ -45,15 +45,13 @@ namespace
 GuiCommand::GuiCommand(const vsg::ref_ptr<vsg::Window>& window)
 {
     _init(window);
-    _uploadFonts(window);
+    _uploadFonts();
 }
 
 GuiCommand::~GuiCommand()
 {
     ImGui_ImplVulkan_Shutdown();
     ImGui::DestroyContext();
-    vkDestroyDescriptorPool(_device, _descriptorPool, nullptr);
-    vkDestroyCommandPool(_device, _commandPool, nullptr);
 }
 
 void GuiCommand::add(const Component& component)
@@ -85,7 +83,6 @@ void GuiCommand::record(vsg::CommandBuffer& commandBuffer) const
 
 void GuiCommand::_init(const vsg::ref_ptr<vsg::Window>& window)
 {
-    VkResult err;
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     // ImGuiIO& io = ImGui::GetIO();
@@ -95,44 +92,36 @@ void GuiCommand::_init(const vsg::ref_ptr<vsg::Window>& window)
     auto [physicalDevice, queueFamily] =
         window->getInstance()->getPhysicalDeviceAndQueueFamily(
             VK_QUEUE_GRAPHICS_BIT);
+
     _queueFamily = queueFamily;
-    _queue = window->getDevice()->getQueue(_queueFamily)->queue();
-    _device = window->getDevice()->getDevice();
+    _queue = window->getDevice()->getQueue(_queueFamily);
+    _device = window->getDevice();
 
     ImGui_ImplVulkan_InitInfo init_info = {};
 
-    init_info.Instance = window->getInstance()->getInstance();
-    init_info.PhysicalDevice = physicalDevice->getPhysicalDevice();
-    init_info.Device = _device;
+    init_info.Instance = *(_device->getInstance());
+    init_info.PhysicalDevice = *(physicalDevice);
+    init_info.Device = *(_device);
     init_info.QueueFamily = _queueFamily;
-    init_info.Queue = _queue;
+    init_info.Queue = *(_queue);
     init_info.PipelineCache = VK_NULL_HANDLE;
 
     // Create Descriptor Pool
-    _descriptorPool = VK_NULL_HANDLE;
-    {
-        VkDescriptorPoolSize pool_sizes[] = {
-            {VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
-            {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
-            {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
-            {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
-            {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000},
-            {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000},
-            {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000},
-            {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
-            {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
-            {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
-            {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}};
-        VkDescriptorPoolCreateInfo pool_info = {};
-        pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        pool_info.maxSets = 1000 * IM_ARRAYSIZE(pool_sizes);
-        pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
-        pool_info.pPoolSizes = pool_sizes;
-        err = vkCreateDescriptorPool(window->getDevice()->getDevice(), &pool_info,
-                                     nullptr, &_descriptorPool);
-        check_vk_result(err);
-    }
+    vsg::DescriptorPoolSizes pool_sizes = {
+        {VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
+        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
+        {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
+        {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}};
+
+    uint32_t maxSets = 1000 * pool_sizes.size();
+    _descriptorPool = vsg::DescriptorPool::create(_device, maxSets, pool_sizes);
 
     VkSurfaceCapabilitiesKHR capabilities;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice->getPhysicalDevice(),
@@ -149,7 +138,7 @@ void GuiCommand::_init(const vsg::ref_ptr<vsg::Window>& window)
             capabilities.maxImageCount); // Vulkan spec specifies 0 as being
                                          // unlimited number of images
 
-    init_info.DescriptorPool = _descriptorPool;
+    init_info.DescriptorPool = *(_descriptorPool);
     init_info.Allocator = nullptr;
     init_info.MinImageCount = capabilities.minImageCount;
     init_info.ImageCount = imageCount;
@@ -158,56 +147,37 @@ void GuiCommand::_init(const vsg::ref_ptr<vsg::Window>& window)
     ImGui_ImplVulkan_Init(&init_info, *window->getOrCreateRenderPass());
 }
 
-void GuiCommand::_uploadFonts(const vsg::ref_ptr<vsg::Window>& window)
+void GuiCommand::_uploadFonts()
 {
     VkResult err;
 
-    // VkcommandPool commandPool;
-    {
-        VkCommandPoolCreateInfo poolInfo = {};
-        poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-        poolInfo.queueFamilyIndex = _queueFamily;
-        poolInfo.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
-        poolInfo.pNext = nullptr;
+    auto commandPool = vsg::CommandPool::create(_device, _queueFamily, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT);
 
-        err = vkCreateCommandPool(_device, &poolInfo,
-                                  window->getDevice()->getAllocationCallbacks(),
-                                  &_commandPool);
-        check_vk_result(err);
-    }
+    auto commandBuffer = vsg::CommandBuffer::create(_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
-    VkCommandBuffer commandBuffer;
-    {
-        VkCommandBufferAllocateInfo allocateInfo = {};
-        allocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocateInfo.commandPool = _commandPool;
-        allocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocateInfo.commandBufferCount = 1;
-        err = vkAllocateCommandBuffers(_device, &allocateInfo, &commandBuffer);
-        check_vk_result(err);
-    }
-
-    err = vkResetCommandPool(_device, _commandPool, 0);
-    check_vk_result(err);
+    commandPool->reset(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT); // required?
 
     VkCommandBufferBeginInfo begin_info = {};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     begin_info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-    err = vkBeginCommandBuffer(commandBuffer, &begin_info);
+    err = vkBeginCommandBuffer(*commandBuffer, &begin_info);
     check_vk_result(err);
 
-    ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
+    ImGui_ImplVulkan_CreateFontsTexture(*commandBuffer);
 
     VkSubmitInfo end_info = {};
     end_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     end_info.commandBufferCount = 1;
-    end_info.pCommandBuffers = &commandBuffer;
-    err = vkEndCommandBuffer(commandBuffer);
-    check_vk_result(err);
-    err = vkQueueSubmit(_queue, 1, &end_info, VK_NULL_HANDLE);
+    end_info.pCommandBuffers = commandBuffer->data();
+    err = vkEndCommandBuffer(*commandBuffer);
     check_vk_result(err);
 
-    err = vkDeviceWaitIdle(_device);
+    err = vkQueueSubmit(*_queue, 1, &end_info, VK_NULL_HANDLE);
+    check_vk_result(err);
+
+    err = vkDeviceWaitIdle(*_device); // use a fence?
+
     check_vk_result(err);
     ImGui_ImplVulkan_DestroyFontUploadObjects();
+
 }

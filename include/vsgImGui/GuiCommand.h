@@ -24,7 +24,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 </editor-fold> */
 
 #include <functional>
+
 #include <vsg/viewer/Window.h>
+#include <vsg/vk/DescriptorPool.h>
 
 #include <vsgImGui/Export.h>
 #include <vsgImGui/imgui.h>
@@ -54,17 +56,14 @@ namespace vsgImGui
     private:
         virtual ~GuiCommand();
 
-        VkInstance _instance;
-        VkDevice _device;
+        vsg::ref_ptr<vsg::Device> _device;
         uint32_t _queueFamily;
-        VkQueue _queue;
-        VkDescriptorPool _descriptorPool;
-        VkCommandPool _commandPool;
-
+        vsg::ref_ptr<vsg::Queue> _queue;
+        vsg::ref_ptr<vsg::DescriptorPool> _descriptorPool;
         Components _components;
 
         void _init(const vsg::ref_ptr<vsg::Window>& window);
-        void _uploadFonts(const vsg::ref_ptr<vsg::Window>& window);
+        void _uploadFonts();
     };
 
 } // namespace vsgImGui
