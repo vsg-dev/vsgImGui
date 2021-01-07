@@ -26,6 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <chrono>
 
 #include <vsg/core/Visitor.h>
+#include <vsg/ui/KeyEvent.h>
 
 #include <vsgImGui/GuiCommand.h>
 
@@ -45,16 +46,20 @@ namespace vsgImGui
         void apply(vsg::ConfigureWindowEvent& configureWindow) override;
         void apply(vsg::FrameEvent& frame) override;
 
-    private:
+    protected:
         ~GuiEventHandler();
 
         uint32_t _convertButton(uint32_t button);
-        std::chrono::high_resolution_clock::time_point t0;
+        void _assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey, vsg::KeyModifier vsgModifier = {});
+        void _assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey, vsg::KeySymbol vsgKeyAlternate, vsg::KeyModifier vsgModifier = {});
+        void _initKeymap();
+        uint16_t _mapToSpecialKey(const vsg::KeyEvent& keyEvent) const;
 
-    protected:
+        std::chrono::high_resolution_clock::time_point t0;
         bool _dragging;
 
-        void initKeymap();
+        using KeyAndModifier = std::pair<vsg::KeySymbol, vsg::KeyModifier>;
+        std::map<KeyAndModifier, uint16_t> _vsgToIntermediateMap;
     };
 } // namespace vsgImGui
 

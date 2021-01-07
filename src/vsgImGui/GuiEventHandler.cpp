@@ -28,117 +28,86 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/ui/ScrollWheelEvent.h>
 
+#include <iostream>
+
 using namespace vsgImGui;
-
-//////////////////////////////////////////////////////////////////////////////
-// Imporant Note: Dear ImGui expects the control Keys indices not to be	    //
-// greater thant 511. It actually uses an array of 512 elements. However,   //
-// OSG has indices greater than that. So here I do a conversion for special //
-// keys between ImGui and OSG.						    //
-//////////////////////////////////////////////////////////////////////////////
-
-/**
- * Special keys that are usually greater than 512 in OSGga
- **/
-enum ConvertedKey : int
-{
-    ConvertedKey_Tab = 257,
-    ConvertedKey_Left,
-    ConvertedKey_Right,
-    ConvertedKey_Up,
-    ConvertedKey_Down,
-    ConvertedKey_PageUp,
-    ConvertedKey_PageDown,
-    ConvertedKey_Home,
-    ConvertedKey_End,
-    ConvertedKey_Delete,
-    ConvertedKey_BackSpace,
-    ConvertedKey_Enter,
-    ConvertedKey_Escape,
-    ConvertedKey_Space,
-    // Modifiers
-    ConvertedKey_LeftControl,
-    ConvertedKey_RightControl,
-    ConvertedKey_LeftShift,
-    ConvertedKey_RightShift,
-    ConvertedKey_LeftAlt,
-    ConvertedKey_RightAlt,
-    ConvertedKey_LeftSuper,
-    ConvertedKey_RightSuper
-};
-
-/**
- * Check for a special key and return the converted code (range [257, 511]) if
- * so. Otherwise returns -1
- */
-static int ConvertFromOSGKey(uint16_t key)
-{
-    using KEY = vsg::KeySymbol;
-
-    switch (key)
-    {
-    default: // Not found
-        return 0;
-    case KEY::KEY_Tab:
-        return ConvertedKey_Tab;
-    case KEY::KEY_Left:
-        return ConvertedKey_Left;
-    case KEY::KEY_Right:
-        return ConvertedKey_Right;
-    case KEY::KEY_Up:
-        return ConvertedKey_Up;
-    case KEY::KEY_Down:
-        return ConvertedKey_Down;
-    case KEY::KEY_Page_Up:
-        return ConvertedKey_PageUp;
-    case KEY::KEY_Page_Down:
-        return ConvertedKey_PageDown;
-    case KEY::KEY_Home:
-        return ConvertedKey_Home;
-    case KEY::KEY_End:
-        return ConvertedKey_End;
-    case KEY::KEY_Delete:
-        return ConvertedKey_Delete;
-    case KEY::KEY_BackSpace:
-        return ConvertedKey_BackSpace;
-    case KEY::KEY_Return:
-        return ConvertedKey_Enter;
-    case KEY::KEY_Escape:
-        return ConvertedKey_Escape;
-    case KEY::KEY_Space:
-        return ConvertedKey_Space;
-
-    case KEY::KEY_Control_L:
-        return ConvertedKey_LeftControl;
-    case KEY::KEY_Control_R:
-        return ConvertedKey_RightControl;
-    case KEY::KEY_Shift_L:
-        return ConvertedKey_LeftShift;
-    case KEY::KEY_Shift_R:
-        return ConvertedKey_RightShift;
-    case KEY::KEY_Alt_L:
-        return ConvertedKey_LeftAlt;
-    case KEY::KEY_Alt_R:
-        return ConvertedKey_RightAlt;
-    case KEY::KEY_Super_L:
-        return ConvertedKey_LeftSuper;
-    case KEY::KEY_Super_R:
-        return ConvertedKey_RightSuper;
-    }
-    assert(false && "Switch has a default case");
-    return 0;
-}
 
 GuiEventHandler::GuiEventHandler() :
     _dragging(false)
 {
     t0 = std::chrono::high_resolution_clock::now();
 
-    initKeymap();
+    _initKeymap();
 }
 
 GuiEventHandler::~GuiEventHandler()
 {
+}
+
+uint32_t GuiEventHandler::_convertButton(uint32_t button)
+{
+    return button == 1 ? 0 : button == 3 ? 1 : button;
+}
+
+void GuiEventHandler::_assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey, vsg::KeyModifier vsgModifier)
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    uint16_t mappedKey = 257 + _vsgToIntermediateMap.size();
+    _vsgToIntermediateMap[KeyAndModifier(vsgKey, vsgModifier)] = mappedKey;
+
+    io.KeyMap[imGuiKey] = mappedKey;
+}
+
+void GuiEventHandler::_assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey, vsg::KeySymbol vsgKeyAlternate, vsg::KeyModifier vsgModifier)
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    uint16_t mappedKey = 257 + _vsgToIntermediateMap.size();
+    _vsgToIntermediateMap[KeyAndModifier(vsgKey, vsgModifier)] = mappedKey;
+    _vsgToIntermediateMap[KeyAndModifier(vsgKeyAlternate, vsgModifier)] = mappedKey;
+
+    io.KeyMap[imGuiKey] = mappedKey;
+}
+
+void GuiEventHandler::_initKeymap()
+{
+    // Keyboard mapping. ImGui will use those indices to peek into the
+    // io.KeyDown[] array.
+    _assignKeyMapping(ImGuiKey_Tab, vsg::KeySymbol::KEY_Tab);
+    _assignKeyMapping(ImGuiKey_LeftArrow, vsg::KeySymbol::KEY_Left);
+    _assignKeyMapping(ImGuiKey_RightArrow, vsg::KeySymbol::KEY_Right);
+    _assignKeyMapping(ImGuiKey_UpArrow, vsg::KeySymbol::KEY_Up);
+    _assignKeyMapping(ImGuiKey_DownArrow, vsg::KeySymbol::KEY_Down);
+    _assignKeyMapping(ImGuiKey_PageUp, vsg::KeySymbol::KEY_Page_Up);
+    _assignKeyMapping(ImGuiKey_PageDown, vsg::KeySymbol::KEY_Page_Down);
+    _assignKeyMapping(ImGuiKey_Home, vsg::KeySymbol::KEY_Home);
+    _assignKeyMapping(ImGuiKey_End, vsg::KeySymbol::KEY_End);
+    _assignKeyMapping(ImGuiKey_Insert, vsg::KeySymbol::KEY_Insert);
+    _assignKeyMapping(ImGuiKey_Delete, vsg::KeySymbol::KEY_Delete);
+    _assignKeyMapping(ImGuiKey_Backspace, vsg::KeySymbol::KEY_BackSpace);
+    _assignKeyMapping(ImGuiKey_Space, vsg::KeySymbol::KEY_Space);
+    _assignKeyMapping(ImGuiKey_Enter, vsg::KeySymbol::KEY_Return);
+    _assignKeyMapping(ImGuiKey_Escape, vsg::KeySymbol::KEY_Escape);
+    _assignKeyMapping(ImGuiKey_KeyPadEnter, vsg::KeySymbol::KEY_KP_Enter);
+    _assignKeyMapping(ImGuiKey_A, vsg::KeySymbol::KEY_A, vsg::KeySymbol::KEY_a, vsg::KeyModifier::MODKEY_Control);
+    _assignKeyMapping(ImGuiKey_C, vsg::KeySymbol::KEY_C, vsg::KeySymbol::KEY_c, vsg::KeyModifier::MODKEY_Control);
+    _assignKeyMapping(ImGuiKey_V, vsg::KeySymbol::KEY_V, vsg::KeySymbol::KEY_v, vsg::KeyModifier::MODKEY_Control);
+    _assignKeyMapping(ImGuiKey_X, vsg::KeySymbol::KEY_X, vsg::KeySymbol::KEY_x, vsg::KeyModifier::MODKEY_Control);
+    _assignKeyMapping(ImGuiKey_Y, vsg::KeySymbol::KEY_Y, vsg::KeySymbol::KEY_y, vsg::KeyModifier::MODKEY_Control);
+    _assignKeyMapping(ImGuiKey_Z, vsg::KeySymbol::KEY_Z, vsg::KeySymbol::KEY_z, vsg::KeyModifier::MODKEY_Control);
+}
+
+uint16_t GuiEventHandler::_mapToSpecialKey(const vsg::KeyEvent& keyEvent) const
+{
+    KeyAndModifier keyAndModifier(keyEvent.keyModified, vsg::KeyModifier(keyEvent.keyModifier & vsg::KeyModifier::MODKEY_Control));
+    auto itr = _vsgToIntermediateMap.find(keyAndModifier);
+    uint16_t special_key = (itr != _vsgToIntermediateMap.end()) ? itr->second : 0;
+
+    assert(special_key < 512 && "ImGui KeysDown is an array of 512");
+    assert(special_key > 256 && "ASCII stop at 127, but we use the range [257, 511]");
+
+    return special_key;
 }
 
 void GuiEventHandler::apply(vsg::ButtonPressEvent& buttonPress)
@@ -158,35 +127,6 @@ void GuiEventHandler::apply(vsg::ButtonPressEvent& buttonPress)
     {
         _dragging = true;
     }
-}
-
-void GuiEventHandler::initKeymap()
-{
-
-    ImGuiIO& io = ImGui::GetIO();
-
-    // Keyboard mapping. ImGui will use those indices to peek into the
-    // io.KeyDown[] array.
-    io.KeyMap[ImGuiKey_Tab] = ConvertedKey_Tab;
-    io.KeyMap[ImGuiKey_LeftArrow] = ConvertedKey_Left;
-    io.KeyMap[ImGuiKey_RightArrow] = ConvertedKey_Right;
-    io.KeyMap[ImGuiKey_UpArrow] = ConvertedKey_Up;
-    io.KeyMap[ImGuiKey_DownArrow] = ConvertedKey_Down;
-    io.KeyMap[ImGuiKey_PageUp] = ConvertedKey_PageUp;
-    io.KeyMap[ImGuiKey_PageDown] = ConvertedKey_PageDown;
-    io.KeyMap[ImGuiKey_Home] = ConvertedKey_Home;
-    io.KeyMap[ImGuiKey_End] = ConvertedKey_End;
-    io.KeyMap[ImGuiKey_Delete] = ConvertedKey_Delete;
-    io.KeyMap[ImGuiKey_Backspace] = ConvertedKey_BackSpace;
-    io.KeyMap[ImGuiKey_Enter] = ConvertedKey_Enter;
-    io.KeyMap[ImGuiKey_Escape] = ConvertedKey_Escape;
-    io.KeyMap[ImGuiKey_Space] = ConvertedKey_Space;
-    io.KeyMap[ImGuiKey_A] = vsg::KeySymbol::KEY_A;
-    io.KeyMap[ImGuiKey_C] = vsg::KeySymbol::KEY_C;
-    io.KeyMap[ImGuiKey_V] = vsg::KeySymbol::KEY_V;
-    io.KeyMap[ImGuiKey_X] = vsg::KeySymbol::KEY_X;
-    io.KeyMap[ImGuiKey_Y] = vsg::KeySymbol::KEY_Y;
-    io.KeyMap[ImGuiKey_Z] = vsg::KeySymbol::KEY_Z;
 }
 
 void GuiEventHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
@@ -233,27 +173,18 @@ void GuiEventHandler::apply(vsg::KeyPressEvent& keyPress)
 
     if (io.WantCaptureKeyboard)
     {
-        const uint16_t c = keyPress.keyModified;
-        const uint16_t special_key = ConvertFromOSGKey(c);
-        if (special_key > 0)
-        {
-            assert(special_key < 512 && "ImGui KeysDown is an array of 512");
-            assert(special_key > 256 &&
-                   "ASCII stop at 127, but we use the range [257, 511]");
+        io.KeyCtrl = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Control) != 0;
+        io.KeyShift = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Shift) != 0;
+        io.KeyAlt = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Alt) != 0;
+        io.KeySuper = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Meta) != 0;
 
+        if (uint16_t special_key = _mapToSpecialKey(keyPress); special_key > 0)
+        {
             io.KeysDown[special_key] = true;
-
-            io.KeyCtrl = io.KeysDown[ConvertedKey_LeftControl] ||
-                         io.KeysDown[ConvertedKey_RightControl];
-            io.KeyShift = io.KeysDown[ConvertedKey_LeftShift] ||
-                          io.KeysDown[ConvertedKey_RightShift];
-            io.KeyAlt = io.KeysDown[ConvertedKey_LeftAlt] ||
-                        io.KeysDown[ConvertedKey_RightAlt];
-            io.KeySuper = io.KeysDown[ConvertedKey_LeftSuper] ||
-                          io.KeysDown[ConvertedKey_RightSuper];
         }
-        else if (c > 0)
+        else if (uint16_t c = keyPress.keyModified; c > 0)
         {
+            if (c < 512) io.KeysDown[c] = true;
             io.AddInputCharacter((unsigned short)c);
         }
 
@@ -267,23 +198,18 @@ void GuiEventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 
     if (io.WantCaptureKeyboard)
     {
-        const uint16_t special_key = ConvertFromOSGKey(keyRelease.keyBase);
-        if (special_key > 0)
+        io.KeyCtrl = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Control) != 0;
+        io.KeyShift = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Shift) != 0;
+        io.KeyAlt = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Alt) != 0;
+        io.KeySuper = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Meta) != 0;
+
+        if (uint16_t special_key = _mapToSpecialKey(keyRelease); special_key > 0)
         {
-            assert(special_key < 512 && "ImGui KeysDown is an array of 512");
-            assert(special_key > 256 &&
-                   "ASCII stop at 127, but we use the range [257, 511]");
-
             io.KeysDown[special_key] = false;
-
-            io.KeyCtrl = io.KeysDown[ConvertedKey_LeftControl] ||
-                         io.KeysDown[ConvertedKey_RightControl];
-            io.KeyShift = io.KeysDown[ConvertedKey_LeftShift] ||
-                          io.KeysDown[ConvertedKey_RightShift];
-            io.KeyAlt = io.KeysDown[ConvertedKey_LeftAlt] ||
-                        io.KeysDown[ConvertedKey_RightAlt];
-            io.KeySuper = io.KeysDown[ConvertedKey_LeftSuper] ||
-                          io.KeysDown[ConvertedKey_RightSuper];
+        }
+        else if (uint16_t c = keyRelease.keyModified; c > 0)
+        {
+            if (c < 512) io.KeysDown[c] = false;
         }
 
         keyRelease.handled = true;
@@ -302,14 +228,8 @@ void GuiEventHandler::apply(vsg::FrameEvent& /*frame*/)
     ImGuiIO& io = ImGui::GetIO();
 
     auto t1 = std::chrono::high_resolution_clock::now();
-    double dt = std::chrono::duration_cast<std::chrono::duration<double>>(t1 - t0)
-                    .count();
+    double dt = std::chrono::duration_cast<std::chrono::duration<double>>(t1 - t0).count();
     t0 = t1;
 
     io.DeltaTime = dt;
-}
-
-uint32_t GuiEventHandler::_convertButton(uint32_t button)
-{
-    return button == 1 ? 0 : button == 3 ? 1 : button;
 }
