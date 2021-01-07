@@ -32,7 +32,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using namespace vsgImGui;
 
-
 GuiEventHandler::GuiEventHandler() :
     _dragging(false)
 {
@@ -179,7 +178,7 @@ void GuiEventHandler::apply(vsg::KeyPressEvent& keyPress)
         io.KeyAlt = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Alt) != 0;
         io.KeySuper = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Meta) != 0;
 
-        if (uint16_t special_key = _mapToSpecialKey(keyPress);special_key > 0)
+        if (uint16_t special_key = _mapToSpecialKey(keyPress); special_key > 0)
         {
             io.KeysDown[special_key] = true;
         }
