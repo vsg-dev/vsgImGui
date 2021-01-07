@@ -53,8 +53,7 @@ namespace vsgImGui
         void _assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey, vsg::KeyModifier vsgModifier = {});
         void _assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey, vsg::KeySymbol vsgKeyAlternate, vsg::KeyModifier vsgModifier = {});
         void _initKeymap();
-
-        uint16_t mapToSpecialKey(const vsg::KeyEvent& keyEvent) const;
+        uint16_t _mapToSpecialKey(const vsg::KeyEvent& keyEvent) const;
 
         std::chrono::high_resolution_clock::time_point t0;
         bool _dragging;

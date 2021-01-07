@@ -99,11 +99,14 @@ void GuiEventHandler::_initKeymap()
     _assignKeyMapping(ImGuiKey_Z, vsg::KeySymbol::KEY_Z, vsg::KeySymbol::KEY_z, vsg::KeyModifier::MODKEY_Control);
 }
 
-uint16_t GuiEventHandler::mapToSpecialKey(const vsg::KeyEvent& keyEvent) const
+uint16_t GuiEventHandler::_mapToSpecialKey(const vsg::KeyEvent& keyEvent) const
 {
     KeyAndModifier keyAndModifier(keyEvent.keyModified, vsg::KeyModifier(keyEvent.keyModifier & vsg::KeyModifier::MODKEY_Control));
     auto itr = _vsgToIntermediateMap.find(keyAndModifier);
     uint16_t special_key = (itr != _vsgToIntermediateMap.end()) ? itr->second : 0;
+
+    assert(special_key < 512 && "ImGui KeysDown is an array of 512");
+    assert(special_key > 256 && "ASCII stop at 127, but we use the range [257, 511]");
 
     return special_key;
 }
@@ -176,17 +179,13 @@ void GuiEventHandler::apply(vsg::KeyPressEvent& keyPress)
         io.KeyAlt = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Alt) != 0;
         io.KeySuper = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Meta) != 0;
 
-        uint16_t c = keyPress.keyModified;
-        uint16_t special_key = mapToSpecialKey(keyPress);
-        if (special_key > 0)
+        if (uint16_t special_key = _mapToSpecialKey(keyPress);special_key > 0)
         {
-            assert(special_key < 512 && "ImGui KeysDown is an array of 512");
-            assert(special_key > 256 && "ASCII stop at 127, but we use the range [257, 511]");
-
             io.KeysDown[special_key] = true;
         }
-        else if (c > 0)
+        else if (uint16_t c = keyPress.keyModified; c > 0)
         {
+            if (c < 512) io.KeysDown[c] = true;
             io.AddInputCharacter((unsigned short)c);
         }
 
@@ -205,13 +204,13 @@ void GuiEventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
         io.KeyAlt = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Alt) != 0;
         io.KeySuper = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Meta) != 0;
 
-        uint16_t special_key = mapToSpecialKey(keyRelease);
-        if (special_key > 0)
+        if (uint16_t special_key = _mapToSpecialKey(keyRelease); special_key > 0)
         {
-            assert(special_key < 512 && "ImGui KeysDown is an array of 512");
-            assert(special_key > 256 && "ASCII stop at 127, but we use the range [257, 511]");
-
             io.KeysDown[special_key] = false;
+        }
+        else if (uint16_t c = keyRelease.keyModified; c > 0)
+        {
+            if (c < 512) io.KeysDown[c] = false;
         }
 
         keyRelease.handled = true;
