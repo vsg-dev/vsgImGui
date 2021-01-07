@@ -57,7 +57,7 @@ namespace vsgImGui
         virtual ~GuiCommand();
 
         vsg::ref_ptr<vsg::Device> _device;
-        uint32_t _queueFamily; // used in _init && _uploadFonts
+        uint32_t _queueFamily;
         vsg::ref_ptr<vsg::Queue> _queue;
         vsg::ref_ptr<vsg::DescriptorPool> _descriptorPool;
         Components _components;
