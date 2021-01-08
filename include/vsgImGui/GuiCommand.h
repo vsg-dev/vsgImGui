@@ -25,6 +25,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <functional>
 
+#include <vsg/commands/ClearAttachments.h>
 #include <vsg/viewer/Window.h>
 #include <vsg/vk/DescriptorPool.h>
 
@@ -37,9 +38,9 @@ namespace vsgImGui
     class VSGIMGUI_DECLSPEC GuiCommand : public vsg::Inherit<vsg::Command, GuiCommand>
     {
     public:
-        GuiCommand(const vsg::ref_ptr<vsg::Window>& window);
+        GuiCommand(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments = false);
 
-        using Component = std::function<void()>;
+        using Component = std::function<bool()>;
         using Components = std::list<Component>;
 
         /// add a GUI rendering component that provides the ImGui calls to render the
@@ -49,7 +50,7 @@ namespace vsgImGui
         Components& getComponents() { return _components; }
         const Components& getComponents() const { return _components; }
 
-        void renderComponents() const;
+        bool renderComponents() const;
 
         void record(vsg::CommandBuffer& commandBuffer) const override;
 
@@ -61,6 +62,8 @@ namespace vsgImGui
         vsg::ref_ptr<vsg::Queue> _queue;
         vsg::ref_ptr<vsg::DescriptorPool> _descriptorPool;
         Components _components;
+
+        vsg::ref_ptr<vsg::ClearAttachments> _clearAttachments;
 
         void _init(const vsg::ref_ptr<vsg::Window>& window);
         void _uploadFonts();

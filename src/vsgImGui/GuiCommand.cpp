@@ -42,10 +42,18 @@ namespace
     }
 } // namespace
 
-GuiCommand::GuiCommand(const vsg::ref_ptr<vsg::Window>& window)
+GuiCommand::GuiCommand(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
 {
     _init(window);
     _uploadFonts();
+
+    if (useClearAttachments)
+    {
+        // clear the depth buffer before view2 gets rendered
+        VkClearAttachment attachment{VK_IMAGE_ASPECT_DEPTH_BIT, 1, VkClearValue{1.0f, 0.0f}};
+        VkClearRect rect{VkRect2D{VkOffset2D{0, 0}, VkExtent2D{window->extent2D().width, window->extent2D().height}}, 0, 1};
+        _clearAttachments = vsg::ClearAttachments::create(vsg::ClearAttachments::Attachments{attachment}, vsg::ClearAttachments::Rects{rect});
+    }
 }
 
 GuiCommand::~GuiCommand()
@@ -54,32 +62,6 @@ GuiCommand::~GuiCommand()
     ImGui::DestroyContext();
 }
 
-void GuiCommand::add(const Component& component)
-{
-    _components.push_back(component);
-}
-
-void GuiCommand::renderComponents() const
-{
-    ImGui_ImplVulkan_NewFrame();
-    ImGui::NewFrame();
-
-    for (auto& component : _components)
-    {
-        component();
-    }
-
-    ImGui::Render();
-}
-
-void GuiCommand::record(vsg::CommandBuffer& commandBuffer) const
-{
-    renderComponents();
-
-    ImDrawData* draw_data = ImGui::GetDrawData();
-    if (draw_data)
-        ImGui_ImplVulkan_RenderDrawData(draw_data, &(*commandBuffer));
-}
 
 void GuiCommand::_init(const vsg::ref_ptr<vsg::Window>& window)
 {
@@ -180,4 +162,39 @@ void GuiCommand::_uploadFonts()
     check_vk_result(err);
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 
+}
+
+void GuiCommand::add(const Component& component)
+{
+    _components.push_back(component);
+}
+
+bool GuiCommand::renderComponents() const
+{
+    ImGui_ImplVulkan_NewFrame();
+    ImGui::NewFrame();
+
+    bool visibleComponents = false;
+    for (auto& component : _components)
+    {
+        if (component()) visibleComponents = true;
+    }
+
+    ImGui::Render();
+
+    return visibleComponents;
+}
+
+void GuiCommand::record(vsg::CommandBuffer& commandBuffer) const
+{
+    bool visibleComponents = renderComponents();
+
+    if (visibleComponents)
+    {
+        if (_clearAttachments) _clearAttachments->record(commandBuffer);
+
+        ImDrawData* draw_data = ImGui::GetDrawData();
+        if (draw_data)
+            ImGui_ImplVulkan_RenderDrawData(draw_data, &(*commandBuffer));
+    }
 }
