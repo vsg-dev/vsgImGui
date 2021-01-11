@@ -28,7 +28,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <vsg/core/Visitor.h>
 #include <vsg/ui/KeyEvent.h>
 
-#include <vsgImGui/GuiCommand.h>
+#include <vsgImGui/RenderImGui.h>
 
 namespace vsgImGui
 {
