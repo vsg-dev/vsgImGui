@@ -32,10 +32,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 namespace vsgImGui
 {
-    class VSGIMGUI_DECLSPEC GuiEventHandler : public vsg::Inherit<vsg::Visitor, GuiEventHandler>
+    class VSGIMGUI_DECLSPEC SendEventsToImGui : public vsg::Inherit<vsg::Visitor, SendEventsToImGui>
     {
     public:
-        GuiEventHandler();
+        SendEventsToImGui();
 
         void apply(vsg::ButtonPressEvent& buttonPress) override;
         void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
@@ -47,7 +47,7 @@ namespace vsgImGui
         void apply(vsg::FrameEvent& frame) override;
 
     protected:
-        ~GuiEventHandler();
+        ~SendEventsToImGui();
 
         uint32_t _convertButton(uint32_t button);
         void _assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey, vsg::KeyModifier vsgModifier = {});
@@ -63,4 +63,4 @@ namespace vsgImGui
     };
 } // namespace vsgImGui
 
-EVSG_type_name(vsgImGui::GuiEventHandler);
+EVSG_type_name(vsgImGui::SendEventsToImGui);

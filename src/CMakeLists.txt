@@ -7,7 +7,7 @@ SET(HEADER_PATH ${CMAKE_SOURCE_DIR}/include/vsgImGui)
 
 set(HEADERS
     ${HEADER_PATH}/imgui.h
-    ${HEADER_PATH}/GuiEventHandler.h
+    ${HEADER_PATH}/SendEventsToImGui.h
     ${HEADER_PATH}/GuiCommand.h
     imgui/imconfig.h
     imgui/imgui_internal.h
@@ -24,7 +24,7 @@ set(SOURCES
     imgui/imgui_widgets.cpp
     imgui/backends/imgui_impl_vulkan.cpp
     vsgImGui/GuiCommand.cpp
-    vsgImGui/GuiEventHandler.cpp
+    vsgImGui/SendEventsToImGui.cpp
 )
 
 

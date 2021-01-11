@@ -21,7 +21,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 </editor-fold> */
 
-#include <vsgImGui/GuiEventHandler.h>
+#include <vsgImGui/SendEventsToImGui.h>
 #include <vsgImGui/imgui.h>
 
 #include <vsg/ui/KeyEvent.h>
@@ -32,7 +32,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using namespace vsgImGui;
 
-GuiEventHandler::GuiEventHandler() :
+SendEventsToImGui::SendEventsToImGui() :
     _dragging(false)
 {
     t0 = std::chrono::high_resolution_clock::now();
@@ -40,16 +40,16 @@ GuiEventHandler::GuiEventHandler() :
     _initKeymap();
 }
 
-GuiEventHandler::~GuiEventHandler()
+SendEventsToImGui::~SendEventsToImGui()
 {
 }
 
-uint32_t GuiEventHandler::_convertButton(uint32_t button)
+uint32_t SendEventsToImGui::_convertButton(uint32_t button)
 {
     return button == 1 ? 0 : button == 3 ? 1 : button;
 }
 
-void GuiEventHandler::_assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey, vsg::KeyModifier vsgModifier)
+void SendEventsToImGui::_assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey, vsg::KeyModifier vsgModifier)
 {
     ImGuiIO& io = ImGui::GetIO();
 
@@ -59,7 +59,7 @@ void GuiEventHandler::_assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey
     io.KeyMap[imGuiKey] = mappedKey;
 }
 
-void GuiEventHandler::_assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey, vsg::KeySymbol vsgKeyAlternate, vsg::KeyModifier vsgModifier)
+void SendEventsToImGui::_assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey, vsg::KeySymbol vsgKeyAlternate, vsg::KeyModifier vsgModifier)
 {
     ImGuiIO& io = ImGui::GetIO();
 
@@ -70,7 +70,7 @@ void GuiEventHandler::_assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey
     io.KeyMap[imGuiKey] = mappedKey;
 }
 
-void GuiEventHandler::_initKeymap()
+void SendEventsToImGui::_initKeymap()
 {
     // Keyboard mapping. ImGui will use those indices to peek into the
     // io.KeyDown[] array.
@@ -98,7 +98,7 @@ void GuiEventHandler::_initKeymap()
     _assignKeyMapping(ImGuiKey_Z, vsg::KeySymbol::KEY_Z, vsg::KeySymbol::KEY_z, vsg::KeyModifier::MODKEY_Control);
 }
 
-uint16_t GuiEventHandler::_mapToSpecialKey(const vsg::KeyEvent& keyEvent) const
+uint16_t SendEventsToImGui::_mapToSpecialKey(const vsg::KeyEvent& keyEvent) const
 {
     KeyAndModifier keyAndModifier(keyEvent.keyModified, vsg::KeyModifier(keyEvent.keyModifier & vsg::KeyModifier::MODKEY_Control));
     auto itr = _vsgToIntermediateMap.find(keyAndModifier);
@@ -110,7 +110,7 @@ uint16_t GuiEventHandler::_mapToSpecialKey(const vsg::KeyEvent& keyEvent) const
     return special_key;
 }
 
-void GuiEventHandler::apply(vsg::ButtonPressEvent& buttonPress)
+void SendEventsToImGui::apply(vsg::ButtonPressEvent& buttonPress)
 {
     ImGuiIO& io = ImGui::GetIO();
 
@@ -129,7 +129,7 @@ void GuiEventHandler::apply(vsg::ButtonPressEvent& buttonPress)
     }
 }
 
-void GuiEventHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
+void SendEventsToImGui::apply(vsg::ButtonReleaseEvent& buttonRelease)
 {
     ImGuiIO& io = ImGui::GetIO();
     if ((!_dragging) && io.WantCaptureMouse)
@@ -145,7 +145,7 @@ void GuiEventHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
     _dragging = false;
 }
 
-void GuiEventHandler::apply(vsg::MoveEvent& moveEvent)
+void SendEventsToImGui::apply(vsg::MoveEvent& moveEvent)
 {
     if (!_dragging)
     {
@@ -157,7 +157,7 @@ void GuiEventHandler::apply(vsg::MoveEvent& moveEvent)
     }
 }
 
-void GuiEventHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
+void SendEventsToImGui::apply(vsg::ScrollWheelEvent& scrollWheel)
 {
     if (!_dragging)
     {
@@ -167,7 +167,7 @@ void GuiEventHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
     }
 }
 
-void GuiEventHandler::apply(vsg::KeyPressEvent& keyPress)
+void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
 {
     ImGuiIO& io = ImGui::GetIO();
 
@@ -192,7 +192,7 @@ void GuiEventHandler::apply(vsg::KeyPressEvent& keyPress)
     }
 }
 
-void GuiEventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
+void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     ImGuiIO& io = ImGui::GetIO();
 
@@ -216,14 +216,14 @@ void GuiEventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
     }
 }
 
-void GuiEventHandler::apply(vsg::ConfigureWindowEvent& configureWindow)
+void SendEventsToImGui::apply(vsg::ConfigureWindowEvent& configureWindow)
 {
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize.x = configureWindow.width;
     io.DisplaySize.y = configureWindow.height;
 }
 
-void GuiEventHandler::apply(vsg::FrameEvent& /*frame*/)
+void SendEventsToImGui::apply(vsg::FrameEvent& /*frame*/)
 {
     ImGuiIO& io = ImGui::GetIO();
 
