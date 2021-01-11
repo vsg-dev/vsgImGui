@@ -40,6 +40,20 @@ namespace vsgImGui
     public:
         RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments = false);
 
+        template<typename... Args>
+        RenderImGui(const vsg::ref_ptr<vsg::Window>& window, Args&... args) :
+            RenderImGui(window, false)
+        {
+            (add(args), ...);
+        }
+
+        template<typename... Args>
+        RenderImGui(const vsg::ref_ptr<vsg::Window>& window, Args&... args, bool useClearAttachments) :
+            RenderImGui(window, useClearAttachments)
+        {
+            (add(args), ...);
+        }
+
         using Component = std::function<bool()>;
         using Components = std::list<Component>;
 
