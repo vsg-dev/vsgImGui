@@ -35,10 +35,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 namespace vsgImGui
 {
 
-    class VSGIMGUI_DECLSPEC GuiCommand : public vsg::Inherit<vsg::Command, GuiCommand>
+    class VSGIMGUI_DECLSPEC RenderImGui : public vsg::Inherit<vsg::Command, RenderImGui>
     {
     public:
-        GuiCommand(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments = false);
+        RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments = false);
 
         using Component = std::function<bool()>;
         using Components = std::list<Component>;
@@ -55,7 +55,7 @@ namespace vsgImGui
         void record(vsg::CommandBuffer& commandBuffer) const override;
 
     private:
-        virtual ~GuiCommand();
+        virtual ~RenderImGui();
 
         vsg::ref_ptr<vsg::Device> _device;
         uint32_t _queueFamily;
@@ -71,4 +71,4 @@ namespace vsgImGui
 
 } // namespace vsgImGui
 
-EVSG_type_name(vsgImGui::GuiCommand);
+EVSG_type_name(vsgImGui::RenderImGui);

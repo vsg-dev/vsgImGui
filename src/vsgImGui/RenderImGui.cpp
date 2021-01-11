@@ -21,7 +21,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 </editor-fold> */
 
-#include <vsgImGui/GuiCommand.h>
+#include <vsgImGui/RenderImGui.h>
 
 #include "../imgui/backends/imgui_impl_vulkan.h"
 
@@ -42,7 +42,7 @@ namespace
     }
 } // namespace
 
-GuiCommand::GuiCommand(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
+RenderImGui::RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
 {
     _init(window);
     _uploadFonts();
@@ -56,14 +56,14 @@ GuiCommand::GuiCommand(const vsg::ref_ptr<vsg::Window>& window, bool useClearAtt
     }
 }
 
-GuiCommand::~GuiCommand()
+RenderImGui::~RenderImGui()
 {
     ImGui_ImplVulkan_Shutdown();
     ImGui::DestroyContext();
 }
 
 
-void GuiCommand::_init(const vsg::ref_ptr<vsg::Window>& window)
+void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window)
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -129,7 +129,7 @@ void GuiCommand::_init(const vsg::ref_ptr<vsg::Window>& window)
     ImGui_ImplVulkan_Init(&init_info, *window->getOrCreateRenderPass());
 }
 
-void GuiCommand::_uploadFonts()
+void RenderImGui::_uploadFonts()
 {
     VkResult err;
 
@@ -164,12 +164,12 @@ void GuiCommand::_uploadFonts()
 
 }
 
-void GuiCommand::add(const Component& component)
+void RenderImGui::add(const Component& component)
 {
     _components.push_back(component);
 }
 
-bool GuiCommand::renderComponents() const
+bool RenderImGui::renderComponents() const
 {
     ImGui_ImplVulkan_NewFrame();
     ImGui::NewFrame();
@@ -185,7 +185,7 @@ bool GuiCommand::renderComponents() const
     return visibleComponents;
 }
 
-void GuiCommand::record(vsg::CommandBuffer& commandBuffer) const
+void RenderImGui::record(vsg::CommandBuffer& commandBuffer) const
 {
     bool visibleComponents = renderComponents();
 
