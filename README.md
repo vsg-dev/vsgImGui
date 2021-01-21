@@ -15,4 +15,4 @@ The first run of cmake will automatically checkout imgui as a submodule when req
 
 ## Example
 
-The [vsgExamples](https://github.com/vsg-dev/vsgExamples.git) repoository provides the [vsgimgui](https://github.com/vsg-dev/vsgExamples/tree/master/Desktop/vsgimgui) example.
+The [vsgExamples](https://github.com/vsg-dev/vsgExamples.git) repoository provides the [vsgimgui](https://github.com/vsg-dev/vsgExamples/tree/master/examples/ui/vsgimgui) example.
