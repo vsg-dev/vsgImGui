@@ -62,7 +62,6 @@ RenderImGui::~RenderImGui()
     ImGui::DestroyContext();
 }
 
-
 void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window)
 {
     IMGUI_CHECKVERSION();
@@ -161,7 +160,6 @@ void RenderImGui::_uploadFonts()
 
     check_vk_result(err);
     ImGui_ImplVulkan_DestroyFontUploadObjects();
-
 }
 
 void RenderImGui::add(const Component& component)
