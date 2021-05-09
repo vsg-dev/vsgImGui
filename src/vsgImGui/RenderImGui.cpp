@@ -70,18 +70,14 @@ void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window)
 
     ImGui::StyleColorsDark();
 
-    auto [physicalDevice, queueFamily] =
-        window->getInstance()->getPhysicalDeviceAndQueueFamily(
-            VK_QUEUE_GRAPHICS_BIT);
+    _device = window->getOrCreateDevice();
 
-    _queueFamily = queueFamily;
-    _queue = window->getDevice()->getQueue(_queueFamily);
-    _device = window->getDevice();
+    std::tie(_queueFamily, std::ignore) = _device->getPhysicalDevice()->getQueueFamily(window->traits()->queueFlags, window->getSurface());
+    _queue = _device->getQueue(_queueFamily);
 
     ImGui_ImplVulkan_InitInfo init_info = {};
-
     init_info.Instance = *(_device->getInstance());
-    init_info.PhysicalDevice = *(physicalDevice);
+    init_info.PhysicalDevice = *(_device->getPhysicalDevice());
     init_info.Device = *(_device);
     init_info.QueueFamily = _queueFamily;
     init_info.Queue = *(_queue);
@@ -105,7 +101,7 @@ void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window)
     _descriptorPool = vsg::DescriptorPool::create(_device, maxSets, pool_sizes);
 
     VkSurfaceCapabilitiesKHR capabilities;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice->getPhysicalDevice(),
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(init_info.PhysicalDevice,
                                               *(window->getSurface()),
                                               &capabilities);
     uint32_t imageCount = 3;
