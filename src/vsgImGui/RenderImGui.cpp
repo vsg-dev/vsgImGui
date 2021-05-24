@@ -174,8 +174,9 @@ bool RenderImGui::renderComponents() const
         if (component()) visibleComponents = true;
     }
 
+    ImGui::EndFrame();
     ImGui::Render();
-
+    
     return visibleComponents;
 }
 
