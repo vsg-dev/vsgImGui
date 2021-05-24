@@ -176,7 +176,7 @@ bool RenderImGui::renderComponents() const
 
     ImGui::EndFrame();
     ImGui::Render();
-    
+
     return visibleComponents;
 }
 
