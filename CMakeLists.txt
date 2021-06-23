@@ -97,6 +97,20 @@ else()
     message("copied imgui.h")
 endif()
 
+execute_process(COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_SOURCE_DIR}/include/vsgImGui/imconfig.h ${CMAKE_SOURCE_DIR}/src/imgui/imconfig.h RESULT_VARIABLE compare_result)
+if (compare_result EQUAL 0)
+else()
+    file(COPY ${CMAKE_SOURCE_DIR}/src/imgui/imconfig.h DESTINATION ${CMAKE_SOURCE_DIR}/include/vsgImGui/)
+    message("copied imconfig.h")
+endif()
+
+execute_process(COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_SOURCE_DIR}/include/vsgImGui/imgui_stdlib.h ${CMAKE_SOURCE_DIR}/src/imgui/misc/cpp/imgui_stdlib.h RESULT_VARIABLE compare_result)
+if (compare_result EQUAL 0)
+else()
+    file(COPY ${CMAKE_SOURCE_DIR}/src/imgui/misc/cpp/imgui_stdlib.h DESTINATION ${CMAKE_SOURCE_DIR}/include/vsgImGui/)
+    message("copied imgui_stdlib.h")
+endif()
+
 
 add_custom_target(clobber
     COMMAND git clean -d -f -x

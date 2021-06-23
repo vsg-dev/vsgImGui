@@ -14,7 +14,8 @@ set(HEADERS
     imgui/imstb_rectpack.h
     imgui/imstb_textedit.h
     imgui/imstb_truetype.h
- )
+    imgui/misc/cpp/imgui_stdlib.h
+)
 
 set(SOURCES
     imgui/imgui.cpp
@@ -25,6 +26,7 @@ set(SOURCES
     imgui/backends/imgui_impl_vulkan.cpp
     vsgImGui/RenderImGui.cpp
     vsgImGui/SendEventsToImGui.cpp
+    imgui/misc/cpp/imgui_stdlib.cpp
 )
 
 
