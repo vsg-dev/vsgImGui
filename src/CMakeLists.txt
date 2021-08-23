@@ -53,12 +53,7 @@ target_link_libraries(vsgImGui
         ${EXTRA_LIBRARIES}
 )
 
-install(TARGETS vsgImGui EXPORT vsgImGuiTargets
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        RUNTIME DESTINATION bin
-        INCLUDES DESTINATION include
-)
+install(TARGETS vsgImGui ${INSTALL_TARGETS_DEFAULT_FLAGS})
 
 if (BUILD_SHARED_LIBS)
     target_compile_definitions(vsgImGui INTERFACE VSGIMGUI_SHARED_LIBRARY)
@@ -71,7 +66,7 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/vsgImGui DESTINATION include)
 install(EXPORT vsgImGuiTargets
     FILE vsgImGuiTargets.cmake
     NAMESPACE vsgImGui::
-    DESTINATION lib/cmake/vsgImGui
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/vsgImGui
 )
 
 include(CMakePackageConfigHelpers)
@@ -83,7 +78,7 @@ write_basic_package_version_file("${CMAKE_BINARY_DIR}/src/vsgImGuiConfigVersion.
 configure_file("${CMAKE_SOURCE_DIR}/src/vsgImGuiConfig.cmake.in" "${CMAKE_BINARY_DIR}/src/vsgImGuiConfig.cmake" @ONLY)
 
 install(FILES "${CMAKE_BINARY_DIR}/src/vsgImGuiConfig.cmake" "${CMAKE_BINARY_DIR}/src/vsgImGuiConfigVersion.cmake"
-    DESTINATION lib/cmake/vsgImGui
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/vsgImGui
 )
 
 # ]==]
