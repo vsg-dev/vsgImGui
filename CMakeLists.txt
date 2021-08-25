@@ -11,7 +11,6 @@ SET(VSGIMGUI_RELEASE_CANDIDATE 0)
 # set the use of C++17 globally as all examples require it
 set(CMAKE_CXX_STANDARD 17)
 
-
 # Find Vulkan and the VSG
 if (VULKAN_SDK)
     set(ENV{VULKAN_SDK} ${VULKAN_SDK})
@@ -66,6 +65,15 @@ add_target_clang_format(
         src/vsgImGui/*.cpp
 )
 add_target_clobber()
+add_target_cppcheck(
+    FILES
+        include/vsgImGui/*.h
+        src/vsgImGui/*.cpp
+)
+add_target_docs(
+    FILES
+        include
+)
 add_target_uninstall()
 
 add_option_maintainer(
@@ -75,3 +83,5 @@ add_option_maintainer(
 
 # source directory for main vsgXchange library
 add_subdirectory(src)
+
+add_feature_summary()
