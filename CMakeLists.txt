@@ -56,27 +56,27 @@ else()
     message("copied imgui_stdlib.h")
 endif()
 
-setup_build_vars()
-setup_dir_vars()
+vsg_setup_build_vars()
+vsg_setup_dir_vars()
 
-add_target_clang_format(
+vsg_add_target_clang_format(
     FILES
         include/vsgImGui/*.h
         src/vsgImGui/*.cpp
 )
-add_target_clobber()
-add_target_cppcheck(
+vsg_add_target_clobber()
+vsg_add_target_cppcheck(
     FILES
         include/vsgImGui/*.h
         src/vsgImGui/*.cpp
 )
-add_target_docs(
+vsg_add_target_docs(
     FILES
         include
 )
-add_target_uninstall()
+vsg_add_target_uninstall()
 
-add_option_maintainer(
+vsg_add_option_maintainer(
     PREFIX vsgImGui
     RCLEVEL VSGIMGUI_RELEASE_CANDIDATE
 )
@@ -84,4 +84,4 @@ add_option_maintainer(
 # source directory for main vsgXchange library
 add_subdirectory(src)
 
-add_feature_summary()
+vsg_add_feature_summary()
