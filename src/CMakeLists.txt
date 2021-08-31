@@ -73,7 +73,6 @@ install(EXPORT vsgImGuiTargets
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file("${CMAKE_BINARY_DIR}/src/vsgImGuiConfigVersion.cmake"
-    VERSION ${VSGIMGUI_MAJOR_VERSION}.${VSGIMGUI_MINOR_VERSION}.${VSGIMGUI_PATCH_VERSION}
     COMPATIBILITY SameMajorVersion
 )
 
