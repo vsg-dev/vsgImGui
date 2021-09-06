@@ -64,23 +64,7 @@ endif()
 
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/vsgImGui DESTINATION include)
 
-# [==[
-install(EXPORT vsgImGuiTargets
-    FILE vsgImGuiTargets.cmake
-    NAMESPACE vsgImGui::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/vsgImGui
+vsg_add_cmake_support_files(
+    CONFIG_TEMPLATE
+        vsgImGuiConfig.cmake.in
 )
-
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file("${CMAKE_BINARY_DIR}/src/vsgImGuiConfigVersion.cmake"
-    VERSION ${VSGIMGUI_MAJOR_VERSION}.${VSGIMGUI_MINOR_VERSION}.${VSGIMGUI_PATCH_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
-
-configure_file("${CMAKE_SOURCE_DIR}/src/vsgImGuiConfig.cmake.in" "${CMAKE_BINARY_DIR}/src/vsgImGuiConfig.cmake" @ONLY)
-
-install(FILES "${CMAKE_BINARY_DIR}/src/vsgImGuiConfig.cmake" "${CMAKE_BINARY_DIR}/src/vsgImGuiConfigVersion.cmake"
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/vsgImGui
-)
-
-# ]==]
