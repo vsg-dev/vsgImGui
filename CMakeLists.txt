@@ -17,7 +17,7 @@ if (VULKAN_SDK)
 endif()
 
 find_package(Vulkan REQUIRED)
-find_package(vsg REQUIRED)
+find_package(vsg 0.1.6 REQUIRED)
 
 # find the optional vsgXchange that can be used for reading and range of image and 3d model formats and shader compilation
 find_package(vsgXchange QUIET)
