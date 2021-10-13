@@ -50,7 +50,9 @@ RenderImGui::RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearA
     if (useClearAttachments)
     {
         // clear the depth buffer before view2 gets rendered
-        VkClearAttachment attachment{VK_IMAGE_ASPECT_DEPTH_BIT, 1, VkClearValue{1.0f, 0.0f}};
+        VkClearValue clearValue{};
+        clearValue.depthStencil = {1.0f, 0};
+        VkClearAttachment attachment{VK_IMAGE_ASPECT_DEPTH_BIT, 1, clearValue};
         VkClearRect rect{VkRect2D{VkOffset2D{0, 0}, VkExtent2D{window->extent2D().width, window->extent2D().height}}, 0, 1};
         _clearAttachments = vsg::ClearAttachments::create(vsg::ClearAttachments::Attachments{attachment}, vsg::ClearAttachments::Rects{rect});
     }
