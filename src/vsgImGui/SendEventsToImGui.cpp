@@ -86,7 +86,6 @@ void SendEventsToImGui::_initKeymap()
     _assignKeyMapping(ImGuiKey_Insert, vsg::KeySymbol::KEY_Insert);
     _assignKeyMapping(ImGuiKey_Delete, vsg::KeySymbol::KEY_Delete);
     _assignKeyMapping(ImGuiKey_Backspace, vsg::KeySymbol::KEY_BackSpace);
-    _assignKeyMapping(ImGuiKey_Space, vsg::KeySymbol::KEY_Space);
     _assignKeyMapping(ImGuiKey_Enter, vsg::KeySymbol::KEY_Return);
     _assignKeyMapping(ImGuiKey_Escape, vsg::KeySymbol::KEY_Escape);
     _assignKeyMapping(ImGuiKey_KeyPadEnter, vsg::KeySymbol::KEY_KP_Enter);
