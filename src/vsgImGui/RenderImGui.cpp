@@ -131,8 +131,7 @@ void RenderImGui::_uploadFonts()
     VkResult err;
 
     auto commandPool = vsg::CommandPool::create(_device, _queueFamily, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT);
-
-    auto commandBuffer = vsg::CommandBuffer::create(_device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+    auto commandBuffer = commandPool->allocate(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
     commandPool->reset(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT); // required?
 
