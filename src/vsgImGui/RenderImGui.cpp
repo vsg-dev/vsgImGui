@@ -25,7 +25,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "../imgui/backends/imgui_impl_vulkan.h"
 
-#include <iostream>
+#include <vsg/vk/SubmitCommands.h>
+#include <vsg/io/Logger.h>
 
 using namespace vsgImGui;
 
@@ -33,12 +34,9 @@ namespace
 {
     void check_vk_result(VkResult err)
     {
-        if (err == 0)
-            return;
+        if (err == 0) return;
 
-        std::cerr << "[vulkan] Error: VkResult = " << err << std::endl;
-        if (err < 0)
-            abort();
+        vsg::error("[vulkan] Error: VkResult = ", err);
     }
 } // namespace
 
@@ -82,7 +80,7 @@ void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window)
     init_info.PhysicalDevice = *(_device->getPhysicalDevice());
     init_info.Device = *(_device);
     init_info.QueueFamily = _queueFamily;
-    init_info.Queue = *(_queue);
+    //init_info.Queue = *(_queue);  // ImGui doesn't use the queue so no need to assign it.
     init_info.PipelineCache = VK_NULL_HANDLE;
 
     // Create Descriptor Pool
@@ -128,34 +126,26 @@ void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window)
 
 void RenderImGui::_uploadFonts()
 {
-    VkResult err;
-
     auto commandPool = vsg::CommandPool::create(_device, _queueFamily, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT);
-    auto commandBuffer = commandPool->allocate(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+    auto fence = vsg::Fence::create(_device);
 
-    commandPool->reset(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT); // required?
+    uint64_t timeout = 1000000000;
+    vsg::submitCommandsToQueue(commandPool, fence, timeout, _queue, [&](vsg::CommandBuffer& commandBuffer)
+    {
+        ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
+    });
 
-    VkCommandBufferBeginInfo begin_info = {};
-    begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    begin_info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-    err = vkBeginCommandBuffer(*commandBuffer, &begin_info);
-    check_vk_result(err);
+    VkResult result = fence->status();
+    while(result == VK_NOT_READY)
+    {
+        result = fence->wait(timeout);
+    }
 
-    ImGui_ImplVulkan_CreateFontsTexture(*commandBuffer);
+    if (result != VK_SUCCESS)
+    {
+        vsg::error("RenderImGui::_uploadFonts(), fence->state() = ", result);
+    }
 
-    VkSubmitInfo end_info = {};
-    end_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    end_info.commandBufferCount = 1;
-    end_info.pCommandBuffers = commandBuffer->data();
-    err = vkEndCommandBuffer(*commandBuffer);
-    check_vk_result(err);
-
-    err = vkQueueSubmit(*_queue, 1, &end_info, VK_NULL_HANDLE);
-    check_vk_result(err);
-
-    err = vkDeviceWaitIdle(*_device); // use a fence?
-
-    check_vk_result(err);
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
 
