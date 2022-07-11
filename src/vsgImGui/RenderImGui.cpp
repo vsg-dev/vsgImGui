@@ -80,7 +80,7 @@ void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window)
     init_info.PhysicalDevice = *(_device->getPhysicalDevice());
     init_info.Device = *(_device);
     init_info.QueueFamily = _queueFamily;
-    //init_info.Queue = *(_queue);  // ImGui doesn't use the queue so no need to assign it.
+    init_info.Queue = *(_queue);  // ImGui doesn't use the queue so we shouldn't need to assign it, but it has an IM_ASSERT requiring it during debug build.
     init_info.PipelineCache = VK_NULL_HANDLE;
 
     // Create Descriptor Pool
