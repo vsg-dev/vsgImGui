@@ -172,6 +172,8 @@ void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
 
     if (io.WantCaptureKeyboard)
     {
+        if (keyPress.keyBase == vsg::KeySymbol::KEY_KP_Enter) keyPress.keyModified = vsg::KeySymbol::KEY_Return;
+
         io.KeyCtrl = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Control) != 0;
         io.KeyShift = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Shift) != 0;
         io.KeyAlt = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Alt) != 0;
@@ -183,8 +185,13 @@ void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
         }
         else if (uint16_t c = keyPress.keyModified; c > 0)
         {
-            if (c < 512) io.KeysDown[c] = true;
-            io.AddInputCharacter((unsigned short)c);
+            // Translate numpad numbers into normal numbers
+            if (c >= 65450 && c <= 65465) c = c - 65408;
+            if (c < 512)
+            {
+                io.KeysDown[c] = true;
+                io.AddInputCharacter((unsigned short)c);
+            }
         }
 
         keyPress.handled = true;
@@ -195,8 +202,13 @@ void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     ImGuiIO& io = ImGui::GetIO();
 
-    if (io.WantCaptureKeyboard)
+    // Imgui input controls loose focus when enter is pressed, so io.WantCaptureKeyboard = false. We need to test for this condition and process the Enter/KP_Enter release
+    if (io.WantCaptureKeyboard
+        || (io.KeysDown[270] == true && keyRelease.keyBase == vsg::KeySymbol::KEY_Return)
+        || (io.KeysDown[270] == true && keyRelease.keyBase == vsg::KeySymbol::KEY_KP_Enter) )
     {
+        if (keyRelease.keyBase == vsg::KeySymbol::KEY_KP_Enter) keyRelease.keyModified = vsg::KeySymbol::KEY_Return;
+
         io.KeyCtrl = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Control) != 0;
         io.KeyShift = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Shift) != 0;
         io.KeyAlt = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Alt) != 0;
@@ -208,6 +220,8 @@ void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
         }
         else if (uint16_t c = keyRelease.keyModified; c > 0)
         {
+            // Translate numpad numbers into normal numbers
+            if (c >= 65450 && c <= 65465) c = c - 65408;
             if (c < 512) io.KeysDown[c] = false;
         }
 
