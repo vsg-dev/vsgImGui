@@ -103,8 +103,8 @@ uint16_t SendEventsToImGui::_mapToSpecialKey(const vsg::KeyEvent& keyEvent) cons
     auto itr = _vsgToIntermediateMap.find(keyAndModifier);
     uint16_t special_key = (itr != _vsgToIntermediateMap.end()) ? itr->second : 0;
 
-    assert(special_key < 512 && "ImGui KeysDown is an array of 512");
-    assert(special_key > 256 && "ASCII stop at 127, but we use the range [257, 511]");
+    // assert(special_key < 512 && "ImGui KeysDown is an array of 512");
+    // assert(special_key > 256 && "ASCII stop at 127, but we use the range [257, 511]");
 
     return special_key;
 }
