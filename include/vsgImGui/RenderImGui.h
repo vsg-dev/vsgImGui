@@ -38,7 +38,7 @@ namespace vsgImGui
     class VSGIMGUI_DECLSPEC RenderImGui : public vsg::Inherit<vsg::Command, RenderImGui>
     {
     public:
-        RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments = false);
+        RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments = false, bool uploadFonts = true);
 
         template<typename... Args>
         RenderImGui(const vsg::ref_ptr<vsg::Window>& window, Args&... args) :

@@ -40,10 +40,10 @@ namespace
     }
 } // namespace
 
-RenderImGui::RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
+RenderImGui::RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments, bool uploadFonts)
 {
     _init(window);
-    _uploadFonts();
+    if(uploadFonts) _uploadFonts();
 
     if (useClearAttachments)
     {
