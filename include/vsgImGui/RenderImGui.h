@@ -68,7 +68,10 @@ namespace vsgImGui
 
         void record(vsg::CommandBuffer& commandBuffer) const override;
 
-    private:
+        void _init(const vsg::ref_ptr<vsg::Window>& window);
+        void _uploadFonts();
+
+    protected:
         virtual ~RenderImGui();
 
         vsg::ref_ptr<vsg::Device> _device;
@@ -79,8 +82,6 @@ namespace vsgImGui
 
         vsg::ref_ptr<vsg::ClearAttachments> _clearAttachments;
 
-        void _init(const vsg::ref_ptr<vsg::Window>& window);
-        void _uploadFonts();
     };
 
 } // namespace vsgImGui
