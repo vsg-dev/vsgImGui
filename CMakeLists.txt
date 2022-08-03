@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.7)
 
+message("vsgImGui CMake")
+
 project(vsgImGui
     VERSION 0.0.0
     DESCRIPTION "VulkanSceneGraph 3rd party data integration library"
