@@ -21,7 +21,7 @@ find_package(vsg 0.4.1 REQUIRED)
 # find the optional vsgXchange that can be used for reading and range of image and 3d model formats and shader compilation
 find_package(vsgXchange QUIET)
 
-if (NOT EXISTS ${CMAKE_SOURCE_DIR}/src/imgui/imgui.h)
+if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui.h)
     find_package(Git QUIET)
 
     execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
@@ -34,24 +34,24 @@ if (NOT EXISTS ${CMAKE_SOURCE_DIR}/src/imgui/imgui.h)
 endif()
 
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_SOURCE_DIR}/include/vsgImGui/imgui.h ${CMAKE_SOURCE_DIR}/src/imgui/imgui.h RESULT_VARIABLE compare_result)
+execute_process(COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_CURRENT_SOURCE_DIR}/include/vsgImGui/imgui.h ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui.h RESULT_VARIABLE compare_result)
 if (compare_result EQUAL 0)
 else()
-    file(COPY ${CMAKE_SOURCE_DIR}/src/imgui/imgui.h DESTINATION ${CMAKE_SOURCE_DIR}/include/vsgImGui/)
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui.h DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/include/vsgImGui/)
     message("copied imgui.h")
 endif()
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_SOURCE_DIR}/include/vsgImGui/imconfig.h ${CMAKE_SOURCE_DIR}/src/imgui/imconfig.h RESULT_VARIABLE compare_result)
+execute_process(COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_CURRENT_SOURCE_DIR}/include/vsgImGui/imconfig.h ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imconfig.h RESULT_VARIABLE compare_result)
 if (compare_result EQUAL 0)
 else()
-    file(COPY ${CMAKE_SOURCE_DIR}/src/imgui/imconfig.h DESTINATION ${CMAKE_SOURCE_DIR}/include/vsgImGui/)
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imconfig.h DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/include/vsgImGui/)
     message("copied imconfig.h")
 endif()
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_SOURCE_DIR}/include/vsgImGui/imgui_stdlib.h ${CMAKE_SOURCE_DIR}/src/imgui/misc/cpp/imgui_stdlib.h RESULT_VARIABLE compare_result)
+execute_process(COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_CURRENT_SOURCE_DIR}/include/vsgImGui/imgui_stdlib.h ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/misc/cpp/imgui_stdlib.h RESULT_VARIABLE compare_result)
 if (compare_result EQUAL 0)
 else()
-    file(COPY ${CMAKE_SOURCE_DIR}/src/imgui/misc/cpp/imgui_stdlib.h DESTINATION ${CMAKE_SOURCE_DIR}/include/vsgImGui/)
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/misc/cpp/imgui_stdlib.h DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/include/vsgImGui/)
     message("copied imgui_stdlib.h")
 endif()
 
