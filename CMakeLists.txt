@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.7)
 
-message("vsgImGui CMake")
-
 project(vsgImGui
     VERSION 0.0.0
     DESCRIPTION "VulkanSceneGraph 3rd party data integration library"
@@ -12,14 +10,6 @@ SET(VSGIMGUI_RELEASE_CANDIDATE 0)
 
 # set the use of C++17 globally as all examples require it
 set(CMAKE_CXX_STANDARD 17)
-
-message("vsgImGui root dir CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
-message("vsgImGui root dir CMAKE_BINARY_DIR = ${CMAKE_BINARY_DIR}")
-message("vsgImGui root dir CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
-message("vsgImGui root dir CMAKE_CURRENT_BINARY_DIR = ${CMAKE_CURRENT_BINARY_DIR}")
-message("vsgImGui root dir CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
-message("vsgImGui root dir CMAKE_CURRENT_LIST_DIR = ${CMAKE_CURRENT_LIST_DIR}")
-message("vsgImGui root dir CMAKE_CURRENT_LIST_FILE = ${CMAKE_CURRENT_LIST_FILE}")
 
 # Find Vulkan and the VSG
 if (VULKAN_SDK)
