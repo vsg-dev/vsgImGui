@@ -3,7 +3,7 @@
 set(EXTRA_DEFINES)
 set(EXTRA_INCLUDES)
 
-SET(HEADER_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../include/vsgImGui)
+SET(HEADER_PATH ${VSGIMGUI_SOURCE_DIR}/../include/vsgImGui)
 
 set(HEADERS
     ${HEADER_PATH}/imgui.h
@@ -42,8 +42,8 @@ set_property(TARGET vsgImGui PROPERTY CXX_STANDARD 17)
 target_compile_definitions(vsgImGui PRIVATE ${EXTRA_DEFINES})
 
 target_include_directories(vsgImGui PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include/vsgImGui>
+    $<BUILD_INTERFACE:${VSGIMGUI_SOURCE_DIR}/../include>
+    $<BUILD_INTERFACE:${VSGIMGUI_SOURCE_DIR}/../include/vsgImGui>
     $<INSTALL_INTERFACE:include>
     ${EXTRA_INCLUDES}
 )
@@ -62,7 +62,7 @@ if (BUILD_SHARED_LIBS)
 endif()
 
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../include/vsgImGui DESTINATION include)
+install(DIRECTORY ${VSGIMGUI_SOURCE_DIR}/../include/vsgImGui DESTINATION include)
 
 vsg_add_cmake_support_files(
     CONFIG_TEMPLATE
