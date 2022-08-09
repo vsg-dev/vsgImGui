@@ -32,6 +32,11 @@ set(SOURCES
 
 add_library(vsgImGui ${HEADERS} ${SOURCES})
 
+# add definitions to enable building vsgImGui as part of submodule
+add_library(vsgImGui::vsgImGui ALIAS vsgImGui)
+set(vsgImGui_FOUND TRUE CACHE INTERNAL "vsgImGui found.")
+set(CMAKE_DISABLE_FIND_PACKAGE_vsgImGui TRUE CACHE INTERNAL "Disable find_package(vsgImGui) as it's not necessary.")
+
 set(EXTRA_DEFINES "IMGUI_USER_CONFIG=<vsgImGui/Export.h>")
 
 set_property(TARGET vsgImGui PROPERTY VERSION ${VSGIMGUI_VERSION_MAJOR}.${VSGIMGUI_VERSION_MINOR}.${VSGIMGUI_VERSION_PATCH})
