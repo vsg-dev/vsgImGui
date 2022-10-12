@@ -3,7 +3,7 @@
 set(EXTRA_DEFINES)
 set(EXTRA_INCLUDES)
 
-SET(HEADER_PATH ${CMAKE_SOURCE_DIR}/include/vsgImGui)
+SET(HEADER_PATH ${VSGIMGUI_SOURCE_DIR}/include/vsgImGui)
 
 set(HEADERS
     ${HEADER_PATH}/imgui.h
@@ -32,6 +32,11 @@ set(SOURCES
 
 add_library(vsgImGui ${HEADERS} ${SOURCES})
 
+# add definitions to enable building vsgImGui as part of submodule
+add_library(vsgImGui::vsgImGui ALIAS vsgImGui)
+set(vsgImGui_FOUND TRUE CACHE INTERNAL "vsgImGui found.")
+set(CMAKE_DISABLE_FIND_PACKAGE_vsgImGui TRUE CACHE INTERNAL "Disable find_package(vsgImGui) as it's not necessary.")
+
 set(EXTRA_DEFINES "IMGUI_USER_CONFIG=<vsgImGui/Export.h>")
 
 set_property(TARGET vsgImGui PROPERTY VERSION ${VSGIMGUI_VERSION_MAJOR}.${VSGIMGUI_VERSION_MINOR}.${VSGIMGUI_VERSION_PATCH})
@@ -42,8 +47,8 @@ set_property(TARGET vsgImGui PROPERTY CXX_STANDARD 17)
 target_compile_definitions(vsgImGui PRIVATE ${EXTRA_DEFINES})
 
 target_include_directories(vsgImGui PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/vsgImGui>
+    $<BUILD_INTERFACE:${VSGIMGUI_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${VSGIMGUI_SOURCE_DIR}/include/vsgImGui>
     $<INSTALL_INTERFACE:include>
     ${EXTRA_INCLUDES}
 )
@@ -62,7 +67,7 @@ if (BUILD_SHARED_LIBS)
 endif()
 
 
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/vsgImGui DESTINATION include)
+install(DIRECTORY ${VSGIMGUI_SOURCE_DIR}/include/vsgImGui DESTINATION include)
 
 vsg_add_cmake_support_files(
     CONFIG_TEMPLATE
