@@ -204,8 +204,8 @@ void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
 
     // Imgui input controls loose focus when enter is pressed, so io.WantCaptureKeyboard = false. We need to test for this condition and process the Enter/KP_Enter release
     if (io.WantCaptureKeyboard
-        || (io.KeysDown[270] == true && keyRelease.keyBase == vsg::KeySymbol::KEY_Return)
-        || (io.KeysDown[270] == true && keyRelease.keyBase == vsg::KeySymbol::KEY_KP_Enter) )
+        || (io.KeysDown[269] == true && keyRelease.keyBase == vsg::KeySymbol::KEY_Return)
+        || (io.KeysDown[269] == true && keyRelease.keyBase == vsg::KeySymbol::KEY_KP_Enter) )
     {
         if (keyRelease.keyBase == vsg::KeySymbol::KEY_KP_Enter) keyRelease.keyModified = vsg::KeySymbol::KEY_Return;
 
