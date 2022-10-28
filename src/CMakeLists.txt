@@ -7,6 +7,7 @@ SET(HEADER_PATH ${VSGIMGUI_SOURCE_DIR}/include/vsgImGui)
 
 set(HEADERS
     ${HEADER_PATH}/imgui.h
+    ${HEADER_PATH}/implot.h
     ${HEADER_PATH}/SendEventsToImGui.h
     ${HEADER_PATH}/RenderImGui.h
     imgui/imconfig.h
@@ -15,6 +16,10 @@ set(HEADERS
     imgui/imstb_textedit.h
     imgui/imstb_truetype.h
     imgui/misc/cpp/imgui_stdlib.h
+    imgui/implot_internal.h
+    imgui/implot.cpp
+    imgui/implot_items.cpp
+    imgui/implot_demo.cpp
 )
 
 set(SOURCES
