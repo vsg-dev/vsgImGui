@@ -25,7 +25,7 @@ if (VULKAN_SDK)
     set(ENV{VULKAN_SDK} ${VULKAN_SDK})
 endif()
 
-find_package(vsg 0.4.1)
+find_package(vsg 0.7.0)
 
 if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui.h)
     find_package(Git QUIET)
