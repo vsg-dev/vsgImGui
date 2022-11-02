@@ -26,7 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <functional>
 
 #include <vsg/commands/ClearAttachments.h>
-#include <vsg/viewer/Window.h>
+#include <vsg/app/Window.h>
 #include <vsg/vk/DescriptorPool.h>
 
 #include <vsgImGui/Export.h>
