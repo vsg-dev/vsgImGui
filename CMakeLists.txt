@@ -58,24 +58,25 @@ else()
     message("copied imgui_stdlib.h")
 endif()
 
-if (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
+vsg_add_target_clang_format(
+    FILES
+        include/vsgImGui/*.h
+        src/vsgImGui/*.cpp
+)
+vsg_add_target_clobber()
+vsg_add_target_cppcheck(
+    FILES
+        include/vsgImGui/*.h
+        src/vsgImGui/*.cpp
+)
+vsg_add_target_docs(
+    FILES
+        include
+)
+vsg_add_target_uninstall()
 
-    vsg_add_target_clang_format(
-        FILES
-            include/vsgImGui/*.h
-            src/vsgImGui/*.cpp
-    )
-    vsg_add_target_clobber()
-    vsg_add_target_cppcheck(
-        FILES
-            include/vsgImGui/*.h
-            src/vsgImGui/*.cpp
-    )
-    vsg_add_target_docs(
-        FILES
-            include
-    )
-    vsg_add_target_uninstall()
+
+if (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
 
     vsg_add_option_maintainer(
         PREFIX vsgImGui
