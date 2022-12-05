@@ -220,8 +220,8 @@ void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
         }
         else if (uint16_t c = keyRelease.keyModified; c > 0)
         {
-            // Translate numpad numbers into normal numbers
-            if (c >= 65450 && c <= 65465) c = c - 65408;
+            // Translate numpad numbers plus related keys (*/+-) into normal numbers and keys
+            if (c >= vsg::KEY_KP_Multiply && c <= vsg::KEY_KP_9) c = c - (vsg::KEY_KP_Multiply - vsg::KEY_Asterisk);
             if (c < 512) io.KeysDown[c] = false;
         }
 
