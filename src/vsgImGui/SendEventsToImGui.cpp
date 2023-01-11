@@ -219,40 +219,38 @@ void SendEventsToImGui::apply(vsg::ScrollWheelEvent& scrollWheel)
     }
 }
 
+void SendEventsToImGui::_updateModifier(ImGuiIO& io, vsg::KeyModifier& modifier, bool press)
+{
+    io.AddKeyEvent(ImGuiMod_Ctrl, press);
+    io.AddKeyEvent(ImGuiMod_Shift, press);
+    io.AddKeyEvent(ImGuiMod_Alt, press);
+    io.AddKeyEvent(ImGuiMod_Super, press);
+}
+
 void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
 {
     ImGuiIO& io = ImGui::GetIO();
 
-    if (io.WantCaptureKeyboard)
-    {
-        io.KeyCtrl = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Control) != 0;
-        io.KeyShift = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Shift) != 0;
-        io.KeyAlt = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Alt) != 0;
-        io.KeySuper = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Meta) != 0;
-
-        auto imguiKey = _vsg2imgui[keyPress.keyBase];
-        io.AddKeyEvent(imguiKey, true);
-
-        keyPress.handled = true;
-    }
+    //if (io.WantCaptureKeyboard)
+    //{
+    _updateModifier(io, keyPress.keyModifier, true);
+    auto imguiKey = _vsg2imgui[keyPress.keyBase];
+    io.AddKeyEvent(imguiKey, true);
+    //keyPress.handled = true;
+    //}
 }
 
 void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     ImGuiIO& io = ImGui::GetIO();
 
-    if (io.WantCaptureKeyboard)
-    {
-        io.KeyCtrl = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Control) != 0;
-        io.KeyShift = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Shift) != 0;
-        io.KeyAlt = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Alt) != 0;
-        io.KeySuper = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Meta) != 0;
-
-        auto imguiKey = _vsg2imgui[keyRelease.keyBase];
-        io.AddKeyEvent(imguiKey, false);
-
-        keyRelease.handled = true;
-    }
+    //if (io.WantCaptureKeyboard)
+    //{
+    _updateModifier(io, keyRelease.keyModifier, true);
+    auto imguiKey = _vsg2imgui[keyRelease.keyBase];
+    io.AddKeyEvent(imguiKey, false);
+    //keyRelease.handled = true;
+    //}
 }
 
 void SendEventsToImGui::apply(vsg::ConfigureWindowEvent& configureWindow)

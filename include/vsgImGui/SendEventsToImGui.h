@@ -45,12 +45,14 @@ namespace vsgImGui
         void apply(vsg::KeyReleaseEvent& keyRelease) override;
         void apply(vsg::ConfigureWindowEvent& configureWindow) override;
         void apply(vsg::FrameEvent& frame) override;
+        
 
     protected:
         ~SendEventsToImGui();
 
         uint32_t _convertButton(uint32_t button);
         void _initKeymap();
+        void _updateModifier(ImGuiIO& io, vsg::KeyModifier& modifier, bool press);
 
         std::chrono::high_resolution_clock::time_point t0;
         bool _dragging;
