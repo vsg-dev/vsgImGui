@@ -219,40 +219,30 @@ void SendEventsToImGui::apply(vsg::ScrollWheelEvent& scrollWheel)
     }
 }
 
-void SendEventsToImGui::_updateModifier(ImGuiIO& io, vsg::KeyModifier& modifier, bool press)
+void SendEventsToImGui::_updateModifier(ImGuiIO& io, vsg::KeyModifier& modifier)
 {
-    io.AddKeyEvent(ImGuiMod_Ctrl, press);
-    io.AddKeyEvent(ImGuiMod_Shift, press);
-    io.AddKeyEvent(ImGuiMod_Alt, press);
-    io.AddKeyEvent(ImGuiMod_Super, press);
+    io.AddKeyEvent(ImGuiMod_Ctrl, (modifier & vsg::MODKEY_Control) != 0);
+    io.AddKeyEvent(ImGuiMod_Shift, (modifier & vsg::MODKEY_Shift) != 0);
+    io.AddKeyEvent(ImGuiMod_Alt, (modifier & vsg::MODKEY_Alt) != 0);
+    io.AddKeyEvent(ImGuiMod_Super, (modifier & vsg::MODKEY_Meta) != 0);
 }
 
 void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
 {
     ImGuiIO& io = ImGui::GetIO();
-
-    //if (io.WantCaptureKeyboard)
-    //{
-    _updateModifier(io, keyPress.keyModifier, true);
+    _updateModifier(io, keyPress.keyModifier);
     auto imguiKey = _vsg2imgui[keyPress.keyBase];
     io.AddKeyEvent(imguiKey, true);
-    //keyPress.handled = true;
-    //}
 }
 
 void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     ImGuiIO& io = ImGui::GetIO();
-
-    //if (io.WantCaptureKeyboard)
-    //{
-    _updateModifier(io, keyRelease.keyModifier, true);
+    _updateModifier(io, keyRelease.keyModifier);
     auto imguiKey = _vsg2imgui[keyRelease.keyBase];
     io.AddKeyEvent(imguiKey, false);
-    //keyRelease.handled = true;
-    //}
 }
-
+ 
 void SendEventsToImGui::apply(vsg::ConfigureWindowEvent& configureWindow)
 {
     ImGuiIO& io = ImGui::GetIO();

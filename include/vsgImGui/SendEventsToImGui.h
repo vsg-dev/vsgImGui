@@ -52,7 +52,7 @@ namespace vsgImGui
 
         uint32_t _convertButton(uint32_t button);
         void _initKeymap();
-        void _updateModifier(ImGuiIO& io, vsg::KeyModifier& modifier, bool press);
+        void _updateModifier(ImGuiIO& io, vsg::KeyModifier& modifier);
 
         std::chrono::high_resolution_clock::time_point t0;
         bool _dragging;
