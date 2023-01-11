@@ -46,67 +46,120 @@ SendEventsToImGui::~SendEventsToImGui()
 
 uint32_t SendEventsToImGui::_convertButton(uint32_t button)
 {
-    return button == 1 ? 0 : button == 3 ? 1 : button;
-}
-
-void SendEventsToImGui::_assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey, vsg::KeyModifier vsgModifier)
-{
-    ImGuiIO& io = ImGui::GetIO();
-
-    uint16_t mappedKey = 257 + _vsgToIntermediateMap.size();
-    _vsgToIntermediateMap[KeyAndModifier(vsgKey, vsgModifier)] = mappedKey;
-
-    io.KeyMap[imGuiKey] = mappedKey;
-}
-
-void SendEventsToImGui::_assignKeyMapping(uint16_t imGuiKey, vsg::KeySymbol vsgKey, vsg::KeySymbol vsgKeyAlternate, vsg::KeyModifier vsgModifier)
-{
-    ImGuiIO& io = ImGui::GetIO();
-
-    uint16_t mappedKey = 257 + _vsgToIntermediateMap.size();
-    _vsgToIntermediateMap[KeyAndModifier(vsgKey, vsgModifier)] = mappedKey;
-    _vsgToIntermediateMap[KeyAndModifier(vsgKeyAlternate, vsgModifier)] = mappedKey;
-
-    io.KeyMap[imGuiKey] = mappedKey;
+    return button == 1 ? 0 : button == 3 ? 1
+                                         : button;
 }
 
 void SendEventsToImGui::_initKeymap()
 {
-    // Keyboard mapping. ImGui will use those indices to peek into the
-    // io.KeyDown[] array.
-    _assignKeyMapping(ImGuiKey_Tab, vsg::KeySymbol::KEY_Tab);
-    _assignKeyMapping(ImGuiKey_LeftArrow, vsg::KeySymbol::KEY_Left);
-    _assignKeyMapping(ImGuiKey_RightArrow, vsg::KeySymbol::KEY_Right);
-    _assignKeyMapping(ImGuiKey_UpArrow, vsg::KeySymbol::KEY_Up);
-    _assignKeyMapping(ImGuiKey_DownArrow, vsg::KeySymbol::KEY_Down);
-    _assignKeyMapping(ImGuiKey_PageUp, vsg::KeySymbol::KEY_Page_Up);
-    _assignKeyMapping(ImGuiKey_PageDown, vsg::KeySymbol::KEY_Page_Down);
-    _assignKeyMapping(ImGuiKey_Home, vsg::KeySymbol::KEY_Home);
-    _assignKeyMapping(ImGuiKey_End, vsg::KeySymbol::KEY_End);
-    _assignKeyMapping(ImGuiKey_Insert, vsg::KeySymbol::KEY_Insert);
-    _assignKeyMapping(ImGuiKey_Delete, vsg::KeySymbol::KEY_Delete);
-    _assignKeyMapping(ImGuiKey_Backspace, vsg::KeySymbol::KEY_BackSpace);
-    _assignKeyMapping(ImGuiKey_Enter, vsg::KeySymbol::KEY_Return);
-    _assignKeyMapping(ImGuiKey_Escape, vsg::KeySymbol::KEY_Escape);
-    _assignKeyMapping(ImGuiKey_KeyPadEnter, vsg::KeySymbol::KEY_KP_Enter);
-    _assignKeyMapping(ImGuiKey_A, vsg::KeySymbol::KEY_A, vsg::KeySymbol::KEY_a, vsg::KeyModifier::MODKEY_Control);
-    _assignKeyMapping(ImGuiKey_C, vsg::KeySymbol::KEY_C, vsg::KeySymbol::KEY_c, vsg::KeyModifier::MODKEY_Control);
-    _assignKeyMapping(ImGuiKey_V, vsg::KeySymbol::KEY_V, vsg::KeySymbol::KEY_v, vsg::KeyModifier::MODKEY_Control);
-    _assignKeyMapping(ImGuiKey_X, vsg::KeySymbol::KEY_X, vsg::KeySymbol::KEY_x, vsg::KeyModifier::MODKEY_Control);
-    _assignKeyMapping(ImGuiKey_Y, vsg::KeySymbol::KEY_Y, vsg::KeySymbol::KEY_y, vsg::KeyModifier::MODKEY_Control);
-    _assignKeyMapping(ImGuiKey_Z, vsg::KeySymbol::KEY_Z, vsg::KeySymbol::KEY_z, vsg::KeyModifier::MODKEY_Control);
-}
-
-uint16_t SendEventsToImGui::_mapToSpecialKey(const vsg::KeyEvent& keyEvent) const
-{
-    KeyAndModifier keyAndModifier(keyEvent.keyModified, vsg::KeyModifier(keyEvent.keyModifier & vsg::KeyModifier::MODKEY_Control));
-    auto itr = _vsgToIntermediateMap.find(keyAndModifier);
-    uint16_t special_key = (itr != _vsgToIntermediateMap.end()) ? itr->second : 0;
-
-    assert(special_key < 512 && "ImGui KeysDown is an array of 512");
-    assert(special_key > 256 && "ASCII stop at 127, but we use the range [257, 511]");
-
-    return special_key;
+    // clang-format off
+    _vsg2imgui[vsg::KEY_Undefined]     = ImGuiKey_None;
+    _vsg2imgui[vsg::KEY_Space]         = ImGuiKey_Space;
+    _vsg2imgui[vsg::KEY_0]             = ImGuiKey_0;
+    _vsg2imgui[vsg::KEY_1]             = ImGuiKey_1;
+    _vsg2imgui[vsg::KEY_2]             = ImGuiKey_2;
+    _vsg2imgui[vsg::KEY_3]             = ImGuiKey_3;
+    _vsg2imgui[vsg::KEY_4]             = ImGuiKey_4;
+    _vsg2imgui[vsg::KEY_5]             = ImGuiKey_5;
+    _vsg2imgui[vsg::KEY_6]             = ImGuiKey_6;
+    _vsg2imgui[vsg::KEY_7]             = ImGuiKey_7;
+    _vsg2imgui[vsg::KEY_8]             = ImGuiKey_8;
+    _vsg2imgui[vsg::KEY_9]             = ImGuiKey_9;
+    _vsg2imgui[vsg::KEY_a]             = ImGuiKey_A;
+    _vsg2imgui[vsg::KEY_b]             = ImGuiKey_B;
+    _vsg2imgui[vsg::KEY_c]             = ImGuiKey_C;
+    _vsg2imgui[vsg::KEY_d]             = ImGuiKey_D;
+    _vsg2imgui[vsg::KEY_e]             = ImGuiKey_E;
+    _vsg2imgui[vsg::KEY_f]             = ImGuiKey_F;
+    _vsg2imgui[vsg::KEY_g]             = ImGuiKey_G;
+    _vsg2imgui[vsg::KEY_h]             = ImGuiKey_H;
+    _vsg2imgui[vsg::KEY_i]             = ImGuiKey_I;
+    _vsg2imgui[vsg::KEY_j]             = ImGuiKey_J;
+    _vsg2imgui[vsg::KEY_k]             = ImGuiKey_K;
+    _vsg2imgui[vsg::KEY_l]             = ImGuiKey_L;
+    _vsg2imgui[vsg::KEY_m]             = ImGuiKey_M;
+    _vsg2imgui[vsg::KEY_n]             = ImGuiKey_N;
+    _vsg2imgui[vsg::KEY_o]             = ImGuiKey_O;
+    _vsg2imgui[vsg::KEY_p]             = ImGuiKey_P;
+    _vsg2imgui[vsg::KEY_q]             = ImGuiKey_Q;
+    _vsg2imgui[vsg::KEY_r]             = ImGuiKey_R;
+    _vsg2imgui[vsg::KEY_s]             = ImGuiKey_S;
+    _vsg2imgui[vsg::KEY_t]             = ImGuiKey_T;
+    _vsg2imgui[vsg::KEY_u]             = ImGuiKey_U;
+    _vsg2imgui[vsg::KEY_v]             = ImGuiKey_V;
+    _vsg2imgui[vsg::KEY_w]             = ImGuiKey_W;
+    _vsg2imgui[vsg::KEY_x]             = ImGuiKey_X;
+    _vsg2imgui[vsg::KEY_y]             = ImGuiKey_Y;
+    _vsg2imgui[vsg::KEY_z]             = ImGuiKey_Z;
+    _vsg2imgui[vsg::KEY_Quote]         = ImGuiKey_Apostrophe;
+    _vsg2imgui[vsg::KEY_Leftparen]     = ImGuiKey_LeftBracket;
+    _vsg2imgui[vsg::KEY_Rightparen]    = ImGuiKey_RightBracket;
+    _vsg2imgui[vsg::KEY_Comma]         = ImGuiKey_Comma;
+    _vsg2imgui[vsg::KEY_Minus]         = ImGuiKey_Minus;
+    _vsg2imgui[vsg::KEY_Period]        = ImGuiKey_Period;
+    _vsg2imgui[vsg::KEY_Slash]         = ImGuiKey_Slash;
+    _vsg2imgui[vsg::KEY_Semicolon]     = ImGuiKey_Semicolon;
+    _vsg2imgui[vsg::KEY_Equals]        = ImGuiKey_Equal;
+    _vsg2imgui[vsg::KEY_Backslash]     = ImGuiKey_Backslash;
+    _vsg2imgui[vsg::KEY_BackSpace]     = ImGuiKey_Backspace;
+    _vsg2imgui[vsg::KEY_Tab]           = ImGuiKey_Tab;
+    _vsg2imgui[vsg::KEY_Return]        = ImGuiKey_Enter;
+    _vsg2imgui[vsg::KEY_Pause]         = ImGuiKey_Pause;
+    _vsg2imgui[vsg::KEY_Scroll_Lock]   = ImGuiKey_ScrollLock;
+    _vsg2imgui[vsg::KEY_Escape]        = ImGuiKey_Escape;
+    _vsg2imgui[vsg::KEY_Delete]        = ImGuiKey_Delete;
+    _vsg2imgui[vsg::KEY_Home]          = ImGuiKey_Home;
+    _vsg2imgui[vsg::KEY_Left]          = ImGuiKey_LeftArrow;
+    _vsg2imgui[vsg::KEY_Up]            = ImGuiKey_UpArrow;
+    _vsg2imgui[vsg::KEY_Right]         = ImGuiKey_RightArrow;
+    _vsg2imgui[vsg::KEY_Down]          = ImGuiKey_DownArrow;
+    _vsg2imgui[vsg::KEY_Page_Up]       = ImGuiKey_PageUp;
+    _vsg2imgui[vsg::KEY_Page_Down]     = ImGuiKey_PageDown;
+    _vsg2imgui[vsg::KEY_End]           = ImGuiKey_End;
+    _vsg2imgui[vsg::KEY_Print]         = ImGuiKey_PrintScreen;
+    _vsg2imgui[vsg::KEY_Insert]        = ImGuiKey_Insert;
+    _vsg2imgui[vsg::KEY_Num_Lock]      = ImGuiKey_NumLock;
+    _vsg2imgui[vsg::KEY_KP_Enter]      = ImGuiKey_KeypadEnter;
+    _vsg2imgui[vsg::KEY_KP_Equal]      = ImGuiKey_KeypadEqual;
+    _vsg2imgui[vsg::KEY_KP_Multiply]   = ImGuiKey_KeypadMultiply;
+    _vsg2imgui[vsg::KEY_KP_Add]        = ImGuiKey_KeypadAdd;
+    _vsg2imgui[vsg::KEY_KP_Subtract]   = ImGuiKey_KeypadSubtract;
+    _vsg2imgui[vsg::KEY_KP_Decimal]    = ImGuiKey_KeypadDecimal;
+    _vsg2imgui[vsg::KEY_KP_Divide]     = ImGuiKey_KeypadDivide;
+    _vsg2imgui[vsg::KEY_KP_0]          = ImGuiKey_Keypad0;
+    _vsg2imgui[vsg::KEY_KP_1]          = ImGuiKey_Keypad1;
+    _vsg2imgui[vsg::KEY_KP_2]          = ImGuiKey_Keypad2;
+    _vsg2imgui[vsg::KEY_KP_3]          = ImGuiKey_Keypad3;
+    _vsg2imgui[vsg::KEY_KP_4]          = ImGuiKey_Keypad4;
+    _vsg2imgui[vsg::KEY_KP_5]          = ImGuiKey_Keypad5;
+    _vsg2imgui[vsg::KEY_KP_6]          = ImGuiKey_Keypad6;
+    _vsg2imgui[vsg::KEY_KP_7]          = ImGuiKey_Keypad7;
+    _vsg2imgui[vsg::KEY_KP_8]          = ImGuiKey_Keypad8;
+    _vsg2imgui[vsg::KEY_KP_9]          = ImGuiKey_Keypad9;
+    _vsg2imgui[vsg::KEY_F1]            = ImGuiKey_F1;
+    _vsg2imgui[vsg::KEY_F2]            = ImGuiKey_F2;
+    _vsg2imgui[vsg::KEY_F3]            = ImGuiKey_F3;
+    _vsg2imgui[vsg::KEY_F4]            = ImGuiKey_F4;
+    _vsg2imgui[vsg::KEY_F5]            = ImGuiKey_F5;
+    _vsg2imgui[vsg::KEY_F6]            = ImGuiKey_F6;
+    _vsg2imgui[vsg::KEY_F7]            = ImGuiKey_F7;
+    _vsg2imgui[vsg::KEY_F8]            = ImGuiKey_F8;
+    _vsg2imgui[vsg::KEY_F9]            = ImGuiKey_F9;
+    _vsg2imgui[vsg::KEY_F10]           = ImGuiKey_F10;
+    _vsg2imgui[vsg::KEY_F11]           = ImGuiKey_F11;
+    _vsg2imgui[vsg::KEY_F12]           = ImGuiKey_F12;
+    _vsg2imgui[vsg::KEY_Shift_L]       = ImGuiKey_LeftShift;
+    _vsg2imgui[vsg::KEY_Shift_R]       = ImGuiKey_RightShift;
+    _vsg2imgui[vsg::KEY_Control_L]     = ImGuiKey_LeftCtrl;
+    _vsg2imgui[vsg::KEY_Control_R]     = ImGuiKey_RightCtrl;
+    _vsg2imgui[vsg::KEY_Caps_Lock]     = ImGuiKey_CapsLock;
+    _vsg2imgui[vsg::KEY_Meta_L]        = ImGuiKey_Menu;
+    _vsg2imgui[vsg::KEY_Meta_R]        = ImGuiKey_Menu;
+    _vsg2imgui[vsg::KEY_Alt_L]         = ImGuiKey_LeftAlt;
+    _vsg2imgui[vsg::KEY_Alt_R]         = ImGuiKey_RightAlt;
+    _vsg2imgui[vsg::KEY_Super_L]       = ImGuiKey_LeftSuper;
+    _vsg2imgui[vsg::KEY_Super_R]       = ImGuiKey_RightSuper;
+    // clang-format on
 }
 
 void SendEventsToImGui::apply(vsg::ButtonPressEvent& buttonPress)
@@ -177,15 +230,8 @@ void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
         io.KeyAlt = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Alt) != 0;
         io.KeySuper = (keyPress.keyModifier & vsg::KeyModifier::MODKEY_Meta) != 0;
 
-        if (uint16_t special_key = _mapToSpecialKey(keyPress); special_key > 0)
-        {
-            io.KeysDown[special_key] = true;
-        }
-        else if (uint16_t c = keyPress.keyModified; c > 0)
-        {
-            if (c < 512) io.KeysDown[c] = true;
-            io.AddInputCharacter((unsigned short)c);
-        }
+        auto imguiKey = _vsg2imgui[keyPress.keyBase];
+        io.AddKeyEvent(imguiKey, true);
 
         keyPress.handled = true;
     }
@@ -202,14 +248,8 @@ void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
         io.KeyAlt = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Alt) != 0;
         io.KeySuper = (keyRelease.keyModifier & vsg::KeyModifier::MODKEY_Meta) != 0;
 
-        if (uint16_t special_key = _mapToSpecialKey(keyRelease); special_key > 0)
-        {
-            io.KeysDown[special_key] = false;
-        }
-        else if (uint16_t c = keyRelease.keyModified; c > 0)
-        {
-            if (c < 512) io.KeysDown[c] = false;
-        }
+        auto imguiKey = _vsg2imgui[keyRelease.keyBase];
+        io.AddKeyEvent(imguiKey, false);
 
         keyRelease.handled = true;
     }
