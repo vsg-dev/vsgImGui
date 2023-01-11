@@ -229,20 +229,31 @@ void SendEventsToImGui::_updateModifier(ImGuiIO& io, vsg::KeyModifier& modifier)
 
 void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
 {
+
     ImGuiIO& io = ImGui::GetIO();
-    _updateModifier(io, keyPress.keyModifier);
-    auto imguiKey = _vsg2imgui[keyPress.keyBase];
-    io.AddKeyEvent(imguiKey, true);
+    if (1)//io.WantCaptureKeyboard)
+    {
+        _updateModifier(io, keyPress.keyModifier);
+        auto imguiKey = _vsg2imgui[keyPress.keyBase];
+        io.AddKeyEvent(imguiKey, true);
+        if (uint16_t c = keyPress.keyModified; c > 0)
+        {
+            io.AddInputCharacter(c);
+        }
+    }
 }
 
 void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     ImGuiIO& io = ImGui::GetIO();
-    _updateModifier(io, keyRelease.keyModifier);
-    auto imguiKey = _vsg2imgui[keyRelease.keyBase];
-    io.AddKeyEvent(imguiKey, false);
+    if (1)//io.WantCaptureKeyboard)
+    {
+        _updateModifier(io, keyRelease.keyModifier);
+        auto imguiKey = _vsg2imgui[keyRelease.keyBase];
+        io.AddKeyEvent(imguiKey, false);
+    }
 }
- 
+
 void SendEventsToImGui::apply(vsg::ConfigureWindowEvent& configureWindow)
 {
     ImGuiIO& io = ImGui::GetIO();
