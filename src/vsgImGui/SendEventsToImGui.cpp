@@ -219,30 +219,48 @@ void SendEventsToImGui::apply(vsg::ScrollWheelEvent& scrollWheel)
     }
 }
 
-void SendEventsToImGui::_updateModifier(ImGuiIO& io, vsg::KeyModifier& modifier)
+void SendEventsToImGui::_updateModifier(ImGuiIO& io, vsg::KeyModifier& modifier, bool pressed)
 {
-    //io.KeyCtrl = 0;  //((modifier & vsg::MODKEY_Control) != 0);
-    //io.KeyShift = 0; //((modifier & vsg::MODKEY_Shift) != 0);
-    //io.KeyAlt = 0;
-    ////((modifier & vsg::MODKEY_Alt) != 0);
-    //io.KeySuper = 0;
-    ////((modifier & vsg::MODKEY_Meta) != 0);
-
-    io.AddKeyEvent(ImGuiMod_Ctrl, (modifier & vsg::MODKEY_Control) != 0);
-    io.AddKeyEvent(ImGuiMod_Shift, (modifier & vsg::MODKEY_Shift) != 0);
-    io.AddKeyEvent(ImGuiMod_Alt, (modifier & vsg::MODKEY_Alt) != 0);
-    io.AddKeyEvent(ImGuiMod_Super, (modifier & vsg::MODKEY_Meta) != 0);
+    if (modifier & vsg::MODKEY_Control)
+    {
+        io.AddKeyEvent(ImGuiMod_Ctrl, pressed);
+    }
+    if (modifier & vsg::MODKEY_Shift)
+    {
+        io.AddKeyEvent(ImGuiMod_Shift, pressed);
+    }
+    if (modifier & vsg::MODKEY_Alt)
+    {
+        io.AddKeyEvent(ImGuiMod_Alt, pressed);
+    }
+    if (modifier & vsg::MODKEY_Meta)
+    {
+        io.AddKeyEvent(ImGuiMod_Super, pressed);
+    }
 }
 
 void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
 {
     ImGuiIO& io = ImGui::GetIO();
-    _updateModifier(io, keyPress.keyModifier);
-    auto imguiKey = _vsg2imgui[keyPress.keyBase];
+    _updateModifier(io, keyPress.keyModifier, true);
+    auto itr = _vsg2imgui.find(keyPress.keyBase);
+    auto imguiKey = ImGuiKey_None;
+    if (itr != _vsg2imgui.end())
+    {
+        imguiKey = itr->second;
+    }
+    else
+    {
+        // This particular VSG key is not handled.
+        imguiKey = ImGuiKey_None;
+    }
     io.AddKeyEvent(imguiKey, true);
+
+    // Irrespective of whether we "handle" the vsg key, if its an ascii character, we add it as an input character.
+    // If someone feels other characters should be allowed please raise an issue.
+    // Its important to do it on keypress so that characters are repeated if user holds the key pressed.
     if (uint16_t c = keyPress.keyModified; c > 0 && c < 255)
     {
-        // its an ascii character.
         io.AddInputCharacter(c);
     }
     keyPress.handled = true;
@@ -251,8 +269,20 @@ void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
 void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     ImGuiIO& io = ImGui::GetIO();
-    _updateModifier(io, keyRelease.keyModifier);
-    auto imguiKey = _vsg2imgui[keyRelease.keyBase];
+    _updateModifier(io, keyRelease.keyModifier, false);
+    auto itr = _vsg2imgui.find(keyRelease.keyBase);
+
+    auto imguiKey = ImGuiKey_None;
+    if (itr != _vsg2imgui.end())
+    {
+        imguiKey = itr->second;
+    }
+    else
+    {
+        // This particular VSG key is not handled.
+        imguiKey = ImGuiKey_None;
+    }
+
     io.AddKeyEvent(imguiKey, false);
     keyRelease.handled = true;
 }
