@@ -251,14 +251,14 @@ void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
     }
     else
     {
-        // This particular VSG key is not handled.
+        // This particular VSG key is not handled. If it should be, please raise an issue or a pull request.
         imguiKey = ImGuiKey_None;
     }
     io.AddKeyEvent(imguiKey, true);
 
-    // Irrespective of whether we "handle" the vsg key, if its an ascii character, we add it as an input character.
-    // If someone feels other characters should be allowed please raise an issue.
-    // Its important to do it on keypress so that characters are repeated if user holds the key pressed.
+    // Irrespective of whether we recognize the vsg key witin _vsg2imgui, if its an ascii character, we add it as an input character.
+    // If other characters should be allowed please raise an issue and pull request.
+    // Adding as an input character on KeyPress allows user to repeat the values until release.
     if (uint16_t c = keyPress.keyModified; c > 0 && c < 255)
     {
         io.AddInputCharacter(c);
@@ -279,7 +279,7 @@ void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
     }
     else
     {
-        // This particular VSG key is not handled.
+        // This particular VSG key is not handled. If it should be, please raise an issue or a pull request.
         imguiKey = ImGuiKey_None;
     }
 
