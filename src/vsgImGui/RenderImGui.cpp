@@ -56,6 +56,16 @@ RenderImGui::RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearA
     }
 }
 
+RenderImGui::RenderImGui(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily,
+            vsg::ref_ptr<vsg::RenderPass> renderPass,
+            uint32_t minImageCount, uint32_t imageCount,
+            VkExtent2D imageSize)
+{
+    _init(device, queueFamily, renderPass, minImageCount, imageCount, imageSize);
+    _uploadFonts();
+    // useClearAttachments == true would require a known size, not possible in this case
+}
+
 RenderImGui::~RenderImGui()
 {
     ImGui_ImplVulkan_Shutdown();
@@ -64,15 +74,51 @@ RenderImGui::~RenderImGui()
 
 void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window)
 {
+    auto device = window->getOrCreateDevice();
+    auto physicalDevice = device->getPhysicalDevice();
+
+    uint32_t queueFamily = 0;
+    std::tie(queueFamily, std::ignore) = physicalDevice->getQueueFamily(window->traits()->queueFlags, window->getSurface());
+    auto queue = device->getQueue(queueFamily);
+
+    VkSurfaceCapabilitiesKHR capabilities;
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(*physicalDevice,
+                                              *(window->getSurface()),
+                                              &capabilities);
+    uint32_t imageCount = 3;
+    imageCount =
+        std::max(imageCount,
+                 capabilities.minImageCount); // Vulkan spec requires
+                                              // minImageCount to be 1 or greater
+    if (capabilities.maxImageCount > 0)
+        imageCount = std::min(
+            imageCount,
+            capabilities.maxImageCount); // Vulkan spec specifies 0 as being
+                                         // unlimited number of images
+
+    _init(device, queueFamily, window->getOrCreateRenderPass(), capabilities.minImageCount, imageCount, window->extent2D());
+}
+
+void RenderImGui::_init(
+    vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily,
+    vsg::ref_ptr<vsg::RenderPass> renderPass,
+    uint32_t minImageCount, uint32_t imageCount,
+    VkExtent2D imageSize)
+{
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    // ImGuiIO& io = ImGui::GetIO();
+
+    // ImGui may change this later, but ensure the display
+    // size is set to something, to prevent assertions
+    // in ImGui::newFrame.
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize.x = imageSize.width;
+    io.DisplaySize.y = imageSize.height;
 
     ImGui::StyleColorsDark();
 
-    _device = window->getOrCreateDevice();
-
-    std::tie(_queueFamily, std::ignore) = _device->getPhysicalDevice()->getQueueFamily(window->traits()->queueFlags, window->getSurface());
+    _device = device;
+    _queueFamily = queueFamily;
     _queue = _device->getQueue(_queueFamily);
 
     ImGui_ImplVulkan_InitInfo init_info = {};
@@ -100,28 +146,13 @@ void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window)
     uint32_t maxSets = 1000 * pool_sizes.size();
     _descriptorPool = vsg::DescriptorPool::create(_device, maxSets, pool_sizes);
 
-    VkSurfaceCapabilitiesKHR capabilities;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(init_info.PhysicalDevice,
-                                              *(window->getSurface()),
-                                              &capabilities);
-    uint32_t imageCount = 3;
-    imageCount =
-        std::max(imageCount,
-                 capabilities.minImageCount); // Vulkan spec requires
-                                              // minImageCount to be 1 or greater
-    if (capabilities.maxImageCount > 0)
-        imageCount = std::min(
-            imageCount,
-            capabilities.maxImageCount); // Vulkan spec specifies 0 as being
-                                         // unlimited number of images
-
     init_info.DescriptorPool = *(_descriptorPool);
     init_info.Allocator = nullptr;
-    init_info.MinImageCount = capabilities.minImageCount;
+    init_info.MinImageCount = minImageCount;
     init_info.ImageCount = imageCount;
     init_info.CheckVkResultFn = check_vk_result;
 
-    ImGui_ImplVulkan_Init(&init_info, *window->getOrCreateRenderPass());
+    ImGui_ImplVulkan_Init(&init_info, *renderPass);
 }
 
 void RenderImGui::_uploadFonts()
