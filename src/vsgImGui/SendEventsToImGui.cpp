@@ -120,6 +120,7 @@ void SendEventsToImGui::_initKeymap()
     _vsg2imgui[vsg::KEY_Insert]        = ImGuiKey_Insert;
     _vsg2imgui[vsg::KEY_Num_Lock]      = ImGuiKey_NumLock;
     _vsg2imgui[vsg::KEY_KP_Enter]      = ImGuiKey_KeypadEnter;
+    // _vsg2imgui[vsg::KEY_KP_Enter]      = ImGuiKey_Enter;
     _vsg2imgui[vsg::KEY_KP_Equal]      = ImGuiKey_KeypadEqual;
     _vsg2imgui[vsg::KEY_KP_Multiply]   = ImGuiKey_KeypadMultiply;
     _vsg2imgui[vsg::KEY_KP_Add]        = ImGuiKey_KeypadAdd;
@@ -274,7 +275,9 @@ void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     ImGuiIO& io = ImGui::GetIO();
 
-    if(io.WantCaptureKeyboard)
+    // io.WantCaptureKeyboard becomes false when Enter is PRESSED. 
+    // We therefore have to also test for Enter to be RELEASED here to prevent undesirable behaviour when next entering a text edit box
+    if(io.WantCaptureKeyboard || keyRelease.keyBase == vsg::KeySymbol::KEY_Return || keyRelease.keyBase == vsg::KeySymbol::KEY_KP_Enter)
     {
         _updateModifier(io, keyRelease.keyModifier, false);
         auto itr = _vsg2imgui.find(keyRelease.keyBase);
