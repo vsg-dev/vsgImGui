@@ -40,10 +40,10 @@ namespace vsgImGui
     public:
         RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments = false);
 
-        RenderImGui(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily,
-                   vsg::ref_ptr<vsg::RenderPass> renderPass,
+        RenderImGui(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily, 
+                   vsg::ref_ptr<vsg::RenderPass> renderPass, 
                    uint32_t minImageCount, uint32_t imageCount,
-                   VkExtent2D imageSize);
+                   VkExtent2D imageSize, bool useClearAttachments = false);
 
         template<typename... Args>
         RenderImGui(const vsg::ref_ptr<vsg::Window>& window, Args&... args) :
@@ -84,11 +84,11 @@ namespace vsgImGui
 
         vsg::ref_ptr<vsg::ClearAttachments> _clearAttachments;
 
-        void _init(const vsg::ref_ptr<vsg::Window>& window);
-        void _init(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily,
-                   vsg::ref_ptr<vsg::RenderPass> renderPass,
+        void _init(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments);
+        void _init(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily, 
+                   vsg::ref_ptr<vsg::RenderPass> renderPass, 
                    uint32_t minImageCount, uint32_t imageCount,
-                   VkExtent2D imageSize);
+                   VkExtent2D imageSize, bool useClearAttachments);
         void _uploadFonts();
     };
 

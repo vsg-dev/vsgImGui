@@ -42,28 +42,17 @@ namespace
 
 RenderImGui::RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
 {
-    _init(window);
+    _init(window, useClearAttachments);
     _uploadFonts();
-
-    if (useClearAttachments)
-    {
-        // clear the depth buffer before view2 gets rendered
-        VkClearValue clearValue{};
-        clearValue.depthStencil = {1.0f, 0};
-        VkClearAttachment attachment{VK_IMAGE_ASPECT_DEPTH_BIT, 1, clearValue};
-        VkClearRect rect{VkRect2D{VkOffset2D{0, 0}, VkExtent2D{window->extent2D().width, window->extent2D().height}}, 0, 1};
-        _clearAttachments = vsg::ClearAttachments::create(vsg::ClearAttachments::Attachments{attachment}, vsg::ClearAttachments::Rects{rect});
-    }
 }
 
 RenderImGui::RenderImGui(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily,
             vsg::ref_ptr<vsg::RenderPass> renderPass,
             uint32_t minImageCount, uint32_t imageCount,
-            VkExtent2D imageSize)
+            VkExtent2D imageSize, bool useClearAttachments)
 {
-    _init(device, queueFamily, renderPass, minImageCount, imageCount, imageSize);
+    _init(device, queueFamily, renderPass, minImageCount, imageCount, imageSize, useClearAttachments);
     _uploadFonts();
-    // useClearAttachments == true would require a known size, not possible in this case
 }
 
 RenderImGui::~RenderImGui()
@@ -72,7 +61,7 @@ RenderImGui::~RenderImGui()
     ImGui::DestroyContext();
 }
 
-void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window)
+void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
 {
     auto device = window->getOrCreateDevice();
     auto physicalDevice = device->getPhysicalDevice();
@@ -96,14 +85,14 @@ void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window)
             capabilities.maxImageCount); // Vulkan spec specifies 0 as being
                                          // unlimited number of images
 
-    _init(device, queueFamily, window->getOrCreateRenderPass(), capabilities.minImageCount, imageCount, window->extent2D());
+    _init(device, queueFamily, window->getOrCreateRenderPass(), capabilities.minImageCount, imageCount, window->extent2D(), useClearAttachments);
 }
 
 void RenderImGui::_init(
     vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily,
     vsg::ref_ptr<vsg::RenderPass> renderPass,
     uint32_t minImageCount, uint32_t imageCount,
-    VkExtent2D imageSize)
+    VkExtent2D imageSize, bool useClearAttachments)
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -153,6 +142,16 @@ void RenderImGui::_init(
     init_info.CheckVkResultFn = check_vk_result;
 
     ImGui_ImplVulkan_Init(&init_info, *renderPass);
+
+    if (useClearAttachments)
+    {
+        // clear the depth buffer before view2 gets rendered
+        VkClearValue clearValue{};
+        clearValue.depthStencil = {1.0f, 0};
+        VkClearAttachment attachment{VK_IMAGE_ASPECT_DEPTH_BIT, 1, clearValue};
+        VkClearRect rect{VkRect2D{VkOffset2D{0, 0}, VkExtent2D{imageSize.width, imageSize.height}}, 0, 1};
+        _clearAttachments = vsg::ClearAttachments::create(vsg::ClearAttachments::Attachments{attachment}, vsg::ClearAttachments::Rects{rect});
+    }
 }
 
 void RenderImGui::_uploadFonts()
