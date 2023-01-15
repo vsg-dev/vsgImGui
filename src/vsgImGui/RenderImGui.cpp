@@ -42,18 +42,17 @@ namespace
 
 RenderImGui::RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
 {
-    _init(window);
+    _init(window, useClearAttachments);
     _uploadFonts();
+}
 
-    if (useClearAttachments)
-    {
-        // clear the depth buffer before view2 gets rendered
-        VkClearValue clearValue{};
-        clearValue.depthStencil = {1.0f, 0};
-        VkClearAttachment attachment{VK_IMAGE_ASPECT_DEPTH_BIT, 1, clearValue};
-        VkClearRect rect{VkRect2D{VkOffset2D{0, 0}, VkExtent2D{window->extent2D().width, window->extent2D().height}}, 0, 1};
-        _clearAttachments = vsg::ClearAttachments::create(vsg::ClearAttachments::Attachments{attachment}, vsg::ClearAttachments::Rects{rect});
-    }
+RenderImGui::RenderImGui(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily,
+            vsg::ref_ptr<vsg::RenderPass> renderPass,
+            uint32_t minImageCount, uint32_t imageCount,
+            VkExtent2D imageSize, bool useClearAttachments)
+{
+    _init(device, queueFamily, renderPass, minImageCount, imageCount, imageSize, useClearAttachments);
+    _uploadFonts();
 }
 
 RenderImGui::~RenderImGui()
@@ -62,17 +61,53 @@ RenderImGui::~RenderImGui()
     ImGui::DestroyContext();
 }
 
-void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window)
+void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
+{
+    auto device = window->getOrCreateDevice();
+    auto physicalDevice = device->getPhysicalDevice();
+
+    uint32_t queueFamily = 0;
+    std::tie(queueFamily, std::ignore) = physicalDevice->getQueueFamily(window->traits()->queueFlags, window->getSurface());
+    auto queue = device->getQueue(queueFamily);
+
+    VkSurfaceCapabilitiesKHR capabilities;
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(*physicalDevice,
+                                              *(window->getSurface()),
+                                              &capabilities);
+    uint32_t imageCount = 3;
+    imageCount =
+        std::max(imageCount,
+                 capabilities.minImageCount); // Vulkan spec requires
+                                              // minImageCount to be 1 or greater
+    if (capabilities.maxImageCount > 0)
+        imageCount = std::min(
+            imageCount,
+            capabilities.maxImageCount); // Vulkan spec specifies 0 as being
+                                         // unlimited number of images
+
+    _init(device, queueFamily, window->getOrCreateRenderPass(), capabilities.minImageCount, imageCount, window->extent2D(), useClearAttachments);
+}
+
+void RenderImGui::_init(
+    vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily,
+    vsg::ref_ptr<vsg::RenderPass> renderPass,
+    uint32_t minImageCount, uint32_t imageCount,
+    VkExtent2D imageSize, bool useClearAttachments)
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    // ImGuiIO& io = ImGui::GetIO();
+
+    // ImGui may change this later, but ensure the display
+    // size is set to something, to prevent assertions
+    // in ImGui::newFrame.
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize.x = imageSize.width;
+    io.DisplaySize.y = imageSize.height;
 
     ImGui::StyleColorsDark();
 
-    _device = window->getOrCreateDevice();
-
-    std::tie(_queueFamily, std::ignore) = _device->getPhysicalDevice()->getQueueFamily(window->traits()->queueFlags, window->getSurface());
+    _device = device;
+    _queueFamily = queueFamily;
     _queue = _device->getQueue(_queueFamily);
 
     ImGui_ImplVulkan_InitInfo init_info = {};
@@ -100,28 +135,23 @@ void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window)
     uint32_t maxSets = 1000 * pool_sizes.size();
     _descriptorPool = vsg::DescriptorPool::create(_device, maxSets, pool_sizes);
 
-    VkSurfaceCapabilitiesKHR capabilities;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(init_info.PhysicalDevice,
-                                              *(window->getSurface()),
-                                              &capabilities);
-    uint32_t imageCount = 3;
-    imageCount =
-        std::max(imageCount,
-                 capabilities.minImageCount); // Vulkan spec requires
-                                              // minImageCount to be 1 or greater
-    if (capabilities.maxImageCount > 0)
-        imageCount = std::min(
-            imageCount,
-            capabilities.maxImageCount); // Vulkan spec specifies 0 as being
-                                         // unlimited number of images
-
     init_info.DescriptorPool = *(_descriptorPool);
     init_info.Allocator = nullptr;
-    init_info.MinImageCount = capabilities.minImageCount;
+    init_info.MinImageCount = minImageCount;
     init_info.ImageCount = imageCount;
     init_info.CheckVkResultFn = check_vk_result;
 
-    ImGui_ImplVulkan_Init(&init_info, *window->getOrCreateRenderPass());
+    ImGui_ImplVulkan_Init(&init_info, *renderPass);
+
+    if (useClearAttachments)
+    {
+        // clear the depth buffer before view2 gets rendered
+        VkClearValue clearValue{};
+        clearValue.depthStencil = {1.0f, 0};
+        VkClearAttachment attachment{VK_IMAGE_ASPECT_DEPTH_BIT, 1, clearValue};
+        VkClearRect rect{VkRect2D{VkOffset2D{0, 0}, VkExtent2D{imageSize.width, imageSize.height}}, 0, 1};
+        _clearAttachments = vsg::ClearAttachments::create(vsg::ClearAttachments::Attachments{attachment}, vsg::ClearAttachments::Rects{rect});
+    }
 }
 
 void RenderImGui::_uploadFonts()
