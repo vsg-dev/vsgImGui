@@ -120,7 +120,6 @@ void SendEventsToImGui::_initKeymap()
     _vsg2imgui[vsg::KEY_Insert]        = ImGuiKey_Insert;
     _vsg2imgui[vsg::KEY_Num_Lock]      = ImGuiKey_NumLock;
     _vsg2imgui[vsg::KEY_KP_Enter]      = ImGuiKey_KeypadEnter;
-    // _vsg2imgui[vsg::KEY_KP_Enter]      = ImGuiKey_Enter;
     _vsg2imgui[vsg::KEY_KP_Equal]      = ImGuiKey_KeypadEqual;
     _vsg2imgui[vsg::KEY_KP_Multiply]   = ImGuiKey_KeypadMultiply;
     _vsg2imgui[vsg::KEY_KP_Add]        = ImGuiKey_KeypadAdd;
@@ -170,9 +169,8 @@ void SendEventsToImGui::apply(vsg::ButtonPressEvent& buttonPress)
     if (io.WantCaptureMouse)
     {
         uint32_t button = _convertButton(buttonPress.button);
-        io.MouseDown[button] = true;
-        io.MousePos.x = buttonPress.x;
-        io.MousePos.y = buttonPress.y;
+        io.AddMousePosEvent(buttonPress.x, buttonPress.y);
+        io.AddMouseButtonEvent(button, true);
 
         buttonPress.handled = true;
     }
@@ -188,9 +186,8 @@ void SendEventsToImGui::apply(vsg::ButtonReleaseEvent& buttonRelease)
     if ((!_dragging) && io.WantCaptureMouse)
     {
         uint32_t button = _convertButton(buttonRelease.button);
-        io.MouseDown[button] = false;
-        io.MousePos.x = buttonRelease.x;
-        io.MousePos.y = buttonRelease.y;
+        io.AddMousePosEvent(buttonRelease.x, buttonRelease.y);
+        io.AddMouseButtonEvent(button, false);
 
         buttonRelease.handled = true;
     }
@@ -203,8 +200,7 @@ void SendEventsToImGui::apply(vsg::MoveEvent& moveEvent)
     if (!_dragging)
     {
         ImGuiIO& io = ImGui::GetIO();
-        io.MousePos.x = moveEvent.x;
-        io.MousePos.y = moveEvent.y;
+        io.AddMousePosEvent(moveEvent.x, moveEvent.y);
 
         moveEvent.handled = io.WantCaptureMouse;
     }
@@ -215,7 +211,8 @@ void SendEventsToImGui::apply(vsg::ScrollWheelEvent& scrollWheel)
     if (!_dragging)
     {
         ImGuiIO& io = ImGui::GetIO();
-        io.MouseWheel += scrollWheel.delta[1];
+        io.AddMouseWheelEvent(0.0, io.MouseWheel += scrollWheel.delta[1]);
+
         scrollWheel.handled = io.WantCaptureMouse;
     }
 }
@@ -247,6 +244,7 @@ void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
     if(io.WantCaptureKeyboard)
     {
         _updateModifier(io, keyPress.keyModifier, true);
+        if (keyPress.keyModified >= vsg::KEY_KP_0 && keyPress.keyModified <= vsg::KEY_KP_9) keyPress.keyBase = keyPress.keyModified;
         auto itr = _vsg2imgui.find(keyPress.keyBase);
         auto imguiKey = ImGuiKey_None;
         if (itr != _vsg2imgui.end())
@@ -280,6 +278,7 @@ void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
     if(io.WantCaptureKeyboard || keyRelease.keyBase == vsg::KeySymbol::KEY_Return || keyRelease.keyBase == vsg::KeySymbol::KEY_KP_Enter)
     {
         _updateModifier(io, keyRelease.keyModifier, false);
+        if (keyRelease.keyModified >= vsg::KEY_KP_0 && keyRelease.keyModified <= vsg::KEY_KP_9) keyRelease.keyBase = keyRelease.keyModified;
         auto itr = _vsg2imgui.find(keyRelease.keyBase);
 
         auto imguiKey = ImGuiKey_None;
