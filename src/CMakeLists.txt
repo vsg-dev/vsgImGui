@@ -15,6 +15,8 @@ set(HEADERS
     imgui/imstb_textedit.h
     imgui/imstb_truetype.h
     imgui/misc/cpp/imgui_stdlib.h
+    implot/implot.h
+    implot/implot_internal.h
 )
 
 set(SOURCES
@@ -27,6 +29,9 @@ set(SOURCES
     vsgImGui/RenderImGui.cpp
     vsgImGui/SendEventsToImGui.cpp
     imgui/misc/cpp/imgui_stdlib.cpp
+    implot/implot.cpp
+    implot/implot_demo.cpp
+    implot/implot_items.cpp
 )
 
 

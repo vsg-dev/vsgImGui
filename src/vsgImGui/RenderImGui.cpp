@@ -22,6 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 </editor-fold> */
 
 #include <vsgImGui/RenderImGui.h>
+#include <vsgImGui/implot.h>
 
 #include "../imgui/backends/imgui_impl_vulkan.h"
 
@@ -58,6 +59,7 @@ RenderImGui::RenderImGui(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily,
 RenderImGui::~RenderImGui()
 {
     ImGui_ImplVulkan_Shutdown();
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
 }
 
@@ -96,6 +98,8 @@ void RenderImGui::_init(
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
+
 
     // ImGui may change this later, but ensure the display
     // size is set to something, to prevent assertions

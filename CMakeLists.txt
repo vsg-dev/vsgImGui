@@ -27,7 +27,8 @@ find_package(vsg 1.0.0)
 vsg_setup_dir_vars()
 vsg_setup_build_vars()
 
-if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui.h)
+if ( (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui.h) OR
+     (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/implot/implot.h) )
     find_package(Git QUIET)
 
     execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
@@ -41,11 +42,13 @@ endif()
 
 vsg_copy_imgui_headers(
     FILES
-        ${CMAKE_SOURCE_DIR}/src/imgui/imgui.h
-        ${CMAKE_SOURCE_DIR}/src/imgui/imconfig.h
-        ${CMAKE_SOURCE_DIR}/src/imgui/imgui_internal.h
-        ${CMAKE_SOURCE_DIR}/src/imgui/imstb_textedit.h
-        ${CMAKE_SOURCE_DIR}/src/imgui//misc/cpp/imgui_stdlib.h
+        ${VSGIMGUI_SOURCE_DIR}/src/imgui/imgui.h
+        ${VSGIMGUI_SOURCE_DIR}/src/imgui/imconfig.h
+        ${VSGIMGUI_SOURCE_DIR}/src/imgui/imgui_internal.h
+        ${VSGIMGUI_SOURCE_DIR}/src/imgui/imstb_textedit.h
+        ${VSGIMGUI_SOURCE_DIR}/src/imgui//misc/cpp/imgui_stdlib.h
+        ${VSGIMGUI_SOURCE_DIR}/src/implot/implot.h
+        ${VSGIMGUI_SOURCE_DIR}/src/implot/implot_internal.h
 )
 
 vsg_add_target_clang_format(
