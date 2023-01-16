@@ -3,4 +3,4 @@
 	url = https://github.com/ocornut/imgui.git
 [submodule "src/implot"]
 	path = src/implot
-	url = git@github.com:epezent/implot.git
+	url = https://github.com/epezent/implot.git
