@@ -169,9 +169,8 @@ void SendEventsToImGui::apply(vsg::ButtonPressEvent& buttonPress)
     if (io.WantCaptureMouse)
     {
         uint32_t button = _convertButton(buttonPress.button);
-        io.MouseDown[button] = true;
-        io.MousePos.x = buttonPress.x;
-        io.MousePos.y = buttonPress.y;
+        io.AddMousePosEvent(buttonPress.x, buttonPress.y);
+        io.AddMouseButtonEvent(button, true);
 
         buttonPress.handled = true;
     }
@@ -187,9 +186,8 @@ void SendEventsToImGui::apply(vsg::ButtonReleaseEvent& buttonRelease)
     if ((!_dragging) && io.WantCaptureMouse)
     {
         uint32_t button = _convertButton(buttonRelease.button);
-        io.MouseDown[button] = false;
-        io.MousePos.x = buttonRelease.x;
-        io.MousePos.y = buttonRelease.y;
+        io.AddMousePosEvent(buttonRelease.x, buttonRelease.y);
+        io.AddMouseButtonEvent(button, false);
 
         buttonRelease.handled = true;
     }
@@ -202,8 +200,7 @@ void SendEventsToImGui::apply(vsg::MoveEvent& moveEvent)
     if (!_dragging)
     {
         ImGuiIO& io = ImGui::GetIO();
-        io.MousePos.x = moveEvent.x;
-        io.MousePos.y = moveEvent.y;
+        io.AddMousePosEvent(moveEvent.x, moveEvent.y);
 
         moveEvent.handled = io.WantCaptureMouse;
     }
@@ -214,7 +211,8 @@ void SendEventsToImGui::apply(vsg::ScrollWheelEvent& scrollWheel)
     if (!_dragging)
     {
         ImGuiIO& io = ImGui::GetIO();
-        io.MouseWheel += scrollWheel.delta[1];
+        io.AddMouseWheelEvent(0.0, io.MouseWheel += scrollWheel.delta[1]);
+
         scrollWheel.handled = io.WantCaptureMouse;
     }
 }
@@ -242,49 +240,61 @@ void SendEventsToImGui::_updateModifier(ImGuiIO& io, vsg::KeyModifier& modifier,
 void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
 {
     ImGuiIO& io = ImGui::GetIO();
-    _updateModifier(io, keyPress.keyModifier, true);
-    auto itr = _vsg2imgui.find(keyPress.keyBase);
-    auto imguiKey = ImGuiKey_None;
-    if (itr != _vsg2imgui.end())
-    {
-        imguiKey = itr->second;
-    }
-    else
-    {
-        // This particular VSG key is not handled. If it should be, please raise an issue or a pull request.
-        imguiKey = ImGuiKey_None;
-    }
-    io.AddKeyEvent(imguiKey, true);
 
-    // Irrespective of whether we recognize the vsg key witin _vsg2imgui, if its an ascii character, we add it as an input character.
-    // If other characters should be allowed please raise an issue and pull request.
-    // Adding as an input character on KeyPress allows user to repeat the values until release.
-    if (uint16_t c = keyPress.keyModified; c > 0 && c < 255)
+    if(io.WantCaptureKeyboard)
     {
-        io.AddInputCharacter(c);
+        _updateModifier(io, keyPress.keyModifier, true);
+        if (keyPress.keyModified >= vsg::KEY_KP_0 && keyPress.keyModified <= vsg::KEY_KP_9) keyPress.keyBase = keyPress.keyModified;
+        auto itr = _vsg2imgui.find(keyPress.keyBase);
+        auto imguiKey = ImGuiKey_None;
+        if (itr != _vsg2imgui.end())
+        {
+            imguiKey = itr->second;
+        }
+        else
+        {
+            // This particular VSG key is not handled. If it should be, please raise an issue or a pull request.
+            imguiKey = ImGuiKey_None;
+        }
+        io.AddKeyEvent(imguiKey, true);
+
+        // Irrespective of whether we recognize the vsg key witin _vsg2imgui, if its an ascii character, we add it as an input character.
+        // If other characters should be allowed please raise an issue and pull request.
+        // Adding as an input character on KeyPress allows user to repeat the values until release.
+        if (uint16_t c = keyPress.keyModified; c > 0 && c < 255)
+        {
+            io.AddInputCharacter(c);
+        }
+        keyPress.handled = true;
     }
-    keyPress.handled = true;
 }
 
 void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     ImGuiIO& io = ImGui::GetIO();
-    _updateModifier(io, keyRelease.keyModifier, false);
-    auto itr = _vsg2imgui.find(keyRelease.keyBase);
 
-    auto imguiKey = ImGuiKey_None;
-    if (itr != _vsg2imgui.end())
+    // io.WantCaptureKeyboard becomes false when Enter is PRESSED. 
+    // We therefore have to also test for Enter to be RELEASED here to prevent undesirable behaviour when next entering a text edit box
+    if(io.WantCaptureKeyboard || keyRelease.keyBase == vsg::KeySymbol::KEY_Return || keyRelease.keyBase == vsg::KeySymbol::KEY_KP_Enter)
     {
-        imguiKey = itr->second;
-    }
-    else
-    {
-        // This particular VSG key is not handled. If it should be, please raise an issue or a pull request.
-        imguiKey = ImGuiKey_None;
-    }
+        _updateModifier(io, keyRelease.keyModifier, false);
+        if (keyRelease.keyModified >= vsg::KEY_KP_0 && keyRelease.keyModified <= vsg::KEY_KP_9) keyRelease.keyBase = keyRelease.keyModified;
+        auto itr = _vsg2imgui.find(keyRelease.keyBase);
 
-    io.AddKeyEvent(imguiKey, false);
-    keyRelease.handled = true;
+        auto imguiKey = ImGuiKey_None;
+        if (itr != _vsg2imgui.end())
+        {
+            imguiKey = itr->second;
+        }
+        else
+        {
+            // This particular VSG key is not handled. If it should be, please raise an issue or a pull request.
+            imguiKey = ImGuiKey_None;
+        }
+
+        io.AddKeyEvent(imguiKey, false);
+        keyRelease.handled = true;
+    }
 }
 
 void SendEventsToImGui::apply(vsg::ConfigureWindowEvent& configureWindow)
