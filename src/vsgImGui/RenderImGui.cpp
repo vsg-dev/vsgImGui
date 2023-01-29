@@ -86,8 +86,9 @@ void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window, bool useClearAt
             imageCount,
             capabilities.maxImageCount); // Vulkan spec specifies 0 as being
                                          // unlimited number of images
-
-    _init(device, queueFamily, window->getOrCreateRenderPass(), capabilities.minImageCount, imageCount, window->extent2D(), useClearAttachments);
+    // ImGui doesn't do anything useful with minImageCount and throws an assert if it is less than 2.
+    _init(device, queueFamily, window->getOrCreateRenderPass(), std::max(2u, capabilities.minImageCount),
+          imageCount, window->extent2D(), useClearAttachments);
 }
 
 void RenderImGui::_init(
