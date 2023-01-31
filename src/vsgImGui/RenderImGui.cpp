@@ -205,6 +205,14 @@ bool RenderImGui::renderComponents() const
     return visibleComponents;
 }
 
+void RenderImGui::compile(vsg::Context& context)
+{
+    for (auto resource : _resources)
+    {
+        resource->compile(context);
+    }
+}
+
 void RenderImGui::record(vsg::CommandBuffer& commandBuffer) const
 {
     bool visibleComponents = renderComponents();

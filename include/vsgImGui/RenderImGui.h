@@ -32,6 +32,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <vsgImGui/Export.h>
 #include <vsgImGui/imgui.h>
 
+#include <vector>
+
 namespace vsgImGui
 {
 
@@ -65,14 +67,20 @@ namespace vsgImGui
         /// add a GUI rendering component that provides the ImGui calls to render the
         /// required GUI elements.
         void add(const Component& component);
-
+        // add a resource (e.g., an ImageComponent) that will need to
+        void addResource(vsg::ref_ptr<vsg::Command> resource)
+        {
+            _resources.push_back(resource);
+        }
         Components& getComponents() { return _components; }
         const Components& getComponents() const { return _components; }
 
         bool renderComponents() const;
 
+        void compile(vsg::Context& context) override;
         void record(vsg::CommandBuffer& commandBuffer) const override;
-
+    protected:
+        std::vector<vsg::ref_ptr<vsg::Command>> _resources;
     private:
         virtual ~RenderImGui();
 
