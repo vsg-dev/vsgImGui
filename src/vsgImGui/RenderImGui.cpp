@@ -27,6 +27,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "../imgui/backends/imgui_impl_vulkan.h"
 
 #include <vsg/vk/SubmitCommands.h>
+#include <vsg/vk/State.h>
 #include <vsg/io/Logger.h>
 
 using namespace vsgImGui;
@@ -188,32 +189,32 @@ void RenderImGui::add(const Component& component)
     _components.push_back(component);
 }
 
-bool RenderImGui::renderComponents() const
+void RenderImGui::accept(vsg::RecordTraversal& rt) const
 {
+    auto& commandBuffer = *(rt.getState()->_commandBuffer);
+    if (_device.get() != commandBuffer.getDevice()) return;
+
+    // record all the ImGui commands to ImDrawData container
     ImGui_ImplVulkan_NewFrame();
     ImGui::NewFrame();
 
-    bool visibleComponents = false;
     for (auto& component : _components)
     {
-        if (component()) visibleComponents = true;
+        component();
     }
+
+    // traverse children
+    traverse(rt);
 
     ImGui::EndFrame();
     ImGui::Render();
 
-    return visibleComponents;
-}
-
-void RenderImGui::record(vsg::CommandBuffer& commandBuffer) const
-{
-    bool visibleComponents = renderComponents();
-
-    if (visibleComponents)
+    // if ImDrawData has been recorded then we need to clear to frame buffer and do the final record to Vulkan command buffer.
+    ImDrawData* draw_data = ImGui::GetDrawData();
+    if (draw_data && draw_data->CmdListsCount > 0)
     {
         if (_clearAttachments) _clearAttachments->record(commandBuffer);
 
-        ImDrawData* draw_data = ImGui::GetDrawData();
         if (draw_data)
             ImGui_ImplVulkan_RenderDrawData(draw_data, &(*commandBuffer));
     }

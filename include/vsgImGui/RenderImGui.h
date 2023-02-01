@@ -25,8 +25,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <functional>
 
-#include <vsg/commands/ClearAttachments.h>
 #include <vsg/app/Window.h>
+#include <vsg/commands/ClearAttachments.h>
+#include <vsg/nodes/Group.h>
 #include <vsg/vk/DescriptorPool.h>
 
 #include <vsgImGui/Export.h>
@@ -35,7 +36,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 namespace vsgImGui
 {
 
-    class VSGIMGUI_DECLSPEC RenderImGui : public vsg::Inherit<vsg::Command, RenderImGui>
+    class VSGIMGUI_DECLSPEC RenderImGui : public vsg::Inherit<vsg::Group, RenderImGui>
     {
     public:
         RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments = false);
@@ -69,9 +70,7 @@ namespace vsgImGui
         Components& getComponents() { return _components; }
         const Components& getComponents() const { return _components; }
 
-        bool renderComponents() const;
-
-        void record(vsg::CommandBuffer& commandBuffer) const override;
+        void accept(vsg::RecordTraversal& rt) const override;
 
     private:
         virtual ~RenderImGui();
