@@ -35,16 +35,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 namespace vsgImGui
 {
+    /// std::function signature with RecordTraverasl used vsgImGui
+    using RecordFunction = std::function<void(vsg::RecordTraversal& rt)>;
 
-    using Component = std::function<bool()>;
+    /// std::function signature used for older vsgImGui versions
+    using LegacyFunction = std::function<bool()>;
 
     class VSGIMGUI_DECLSPEC ImGuiNode : public vsg::Inherit<vsg::Node, ImGuiNode>
     {
     public:
 
-        ImGuiNode(Component in_component) : component(in_component) {};
+        template<typename... Args>
+        ImGuiNode(Args&... args)
+        {
+            (add(args), ...);
+        };
 
-        Component component;
+        void add(const RecordFunction& recordFunc) { recordList.push_back(recordFunc); }
+        void add(const LegacyFunction& legacyFunc) { legacyList.push_back(legacyFunc); }
+
+        std::list<RecordFunction> recordList;
+        std::list<LegacyFunction> legacyList;
 
         void accept(vsg::RecordTraversal& rt) const override;
     };
@@ -73,9 +84,11 @@ namespace vsgImGui
             (add(args), ...);
         }
 
-        /// add a GUI rendering component that provides the ImGui calls to render the
-        /// required GUI elements.
-        void add(const Component& component) { addChild(ImGuiNode::create(component)); }
+        /// add a GUI rendering component that provides the ImGui calls to render the required GUI elements.
+        void add(const LegacyFunction& legacyFunc) { addChild(ImGuiNode::create(legacyFunc)); }
+
+        /// add a GUI rendering component that provides the ImGui calls to render the required GUI elements.
+        void add(const RecordFunction& recordFunc) { addChild(ImGuiNode::create(recordFunc)); }
 
         /// add a child, equivilant to Group::addChild(..) but adds compatibility with the RenderImGui constructor
         void add(vsg::ref_ptr<vsg::Node> child) { addChild(child); }

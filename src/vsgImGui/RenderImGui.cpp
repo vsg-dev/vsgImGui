@@ -43,9 +43,10 @@ namespace
 } // namespace
 
 
-void ImGuiNode::accept(vsg::RecordTraversal&) const
+void ImGuiNode::accept(vsg::RecordTraversal& rt) const
 {
-    component();
+    for(auto& func : recordList) func(rt);
+    for(auto& func : legacyList) func();
 }
 
 RenderImGui::RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
