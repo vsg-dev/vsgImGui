@@ -42,6 +42,12 @@ namespace
     }
 } // namespace
 
+
+void ImGuiNode::accept(vsg::RecordTraversal&) const
+{
+    component();
+}
+
 RenderImGui::RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
 {
     _init(window, useClearAttachments);
@@ -184,11 +190,6 @@ void RenderImGui::_uploadFonts()
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
 
-void RenderImGui::add(const Component& component)
-{
-    _components.push_back(component);
-}
-
 void RenderImGui::accept(vsg::RecordTraversal& rt) const
 {
     auto& commandBuffer = *(rt.getState()->_commandBuffer);
@@ -197,11 +198,6 @@ void RenderImGui::accept(vsg::RecordTraversal& rt) const
     // record all the ImGui commands to ImDrawData container
     ImGui_ImplVulkan_NewFrame();
     ImGui::NewFrame();
-
-    for (auto& component : _components)
-    {
-        component();
-    }
 
     // traverse children
     traverse(rt);

@@ -36,6 +36,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 namespace vsgImGui
 {
 
+    using Component = std::function<bool()>;
+
+    class VSGIMGUI_DECLSPEC ImGuiNode : public vsg::Inherit<vsg::Node, ImGuiNode>
+    {
+    public:
+
+        ImGuiNode(Component in_component) : component(in_component) {};
+
+        Component component;
+
+        void accept(vsg::RecordTraversal& rt) const override;
+    };
+
     class VSGIMGUI_DECLSPEC RenderImGui : public vsg::Inherit<vsg::Group, RenderImGui>
     {
     public:
@@ -60,15 +73,12 @@ namespace vsgImGui
             (add(args), ...);
         }
 
-        using Component = std::function<bool()>;
-        using Components = std::list<Component>;
-
         /// add a GUI rendering component that provides the ImGui calls to render the
         /// required GUI elements.
-        void add(const Component& component);
+        void add(const Component& component) { addChild(ImGuiNode::create(component)); }
 
-        Components& getComponents() { return _components; }
-        const Components& getComponents() const { return _components; }
+        /// add a child, equivilant to Group::addChild(..) but adds compatibility with the RenderImGui constructor
+        void add(vsg::ref_ptr<vsg::Node> child) { addChild(child); }
 
         void accept(vsg::RecordTraversal& rt) const override;
 
@@ -79,7 +89,6 @@ namespace vsgImGui
         uint32_t _queueFamily;
         vsg::ref_ptr<vsg::Queue> _queue;
         vsg::ref_ptr<vsg::DescriptorPool> _descriptorPool;
-        Components _components;
 
         vsg::ref_ptr<vsg::ClearAttachments> _clearAttachments;
 
