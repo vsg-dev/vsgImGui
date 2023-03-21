@@ -108,6 +108,11 @@ void RenderImGui::_init(
     ImGui::CreateContext();
     ImPlot::CreateContext();
 
+    VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT;
+    for(auto& attachment : renderPass->attachments)
+    {
+        if (attachment.samples > samples) samples = attachment.samples;
+    }
 
     // ImGui may change this later, but ensure the display
     // size is set to something, to prevent assertions
@@ -129,6 +134,7 @@ void RenderImGui::_init(
     init_info.QueueFamily = _queueFamily;
     init_info.Queue = *(_queue);  // ImGui doesn't use the queue so we shouldn't need to assign it, but it has an IM_ASSERT requiring it during debug build.
     init_info.PipelineCache = VK_NULL_HANDLE;
+    init_info.MSAASamples = samples;
 
     // Create Descriptor Pool
     vsg::DescriptorPoolSizes pool_sizes = {
