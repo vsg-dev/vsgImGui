@@ -41,26 +41,15 @@ namespace vsgImGui
     class VSGIMGUI_DECLSPEC ImageComponent : public vsg::Inherit<vsg::Command, ImageComponent>
     {
     public:
-        ImageComponent(vsg::ref_ptr<vsg::Window> window, vsg::ref_ptr<vsg::Data> texData);
-        /**
-         * @brief Call ImGui::Image with the dimensions of the texture.
-         */
-        bool operator()();
-        template<typename... Args>
-        bool operator()(float displayWidth, float displayHeight, Args&&... args)
-        {
-            ImGui::Image(getTextureID(),
-                         ImVec2(displayWidth, displayHeight), args...);
-            return true;
-        }
+        ImageComponent(vsg::ref_ptr<vsg::Data> texData);
+
         void compile(vsg::Context& context) override;
         void record(vsg::CommandBuffer& commandBuffer) const override;
-        ImTextureID getTextureID() const;
+
+        ImTextureID getTextureID(uint32_t deviceID) const;
         
         vsg::ref_ptr<vsg::DescriptorSet> descriptorSet;
         uint32_t height;
         uint32_t width;
-    protected:
-        vsg::ref_ptr<vsg::Window> _window;
     };
 }

@@ -55,31 +55,20 @@ namespace
     }
 } // namespace
 
-ImageComponent::ImageComponent(vsg::ref_ptr<vsg::Window> window, vsg::ref_ptr<vsg::Data> texData) :
-    height(texData->height()), width(texData->width()), _window(window)
+ImageComponent::ImageComponent(vsg::ref_ptr<vsg::Data> texData) :
+    height(texData->height()), width(texData->width())
 {
     descriptorSet = makeImageDescriptorSet(texData);
 }
 
 void ImageComponent::compile(vsg::Context& context)
 {
-    if (_window->getDevice()->deviceID != context.deviceID)
-    {
-        vsg::fatal("ImageComponent can only be used in the Window for which it was created.");
-        return;
-    }
     descriptorSet->compile(context);
 }
 
-ImTextureID ImageComponent::getTextureID() const
+ImTextureID ImageComponent::getTextureID(uint32_t deviceID) const
 {
-    return static_cast<ImTextureID>(descriptorSet->vk(_window->getDevice()->deviceID));
-}
-
-bool ImageComponent::operator()()
-{
-    ImGui::Image(getTextureID(), ImVec2(static_cast<float>(width), static_cast<float>(height)));
-    return true;
+    return static_cast<ImTextureID>(descriptorSet->vk(deviceID));
 }
 
 void ImageComponent::record(vsg::CommandBuffer&) const
