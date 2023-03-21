@@ -9,6 +9,7 @@ set(HEADERS
     ${HEADER_PATH}/imgui.h
     ${HEADER_PATH}/SendEventsToImGui.h
     ${HEADER_PATH}/RenderImGui.h
+    ${HEADER_PATH}/ImageComponent.h
     imgui/imconfig.h
     imgui/imgui_internal.h
     imgui/imstb_rectpack.h
@@ -20,14 +21,15 @@ set(HEADERS
 )
 
 set(SOURCES
+    vsgImGui/RenderImGui.cpp
+    vsgImGui/SendEventsToImGui.cpp
+    vsgImGui/ImageComponent.cpp
     imgui/imgui.cpp
     imgui/imgui_demo.cpp
     imgui/imgui_draw.cpp
     imgui/imgui_tables.cpp
     imgui/imgui_widgets.cpp
     imgui/backends/imgui_impl_vulkan.cpp
-    vsgImGui/RenderImGui.cpp
-    vsgImGui/SendEventsToImGui.cpp
     imgui/misc/cpp/imgui_stdlib.cpp
     implot/implot.cpp
     implot/implot_demo.cpp
