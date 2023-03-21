@@ -17,8 +17,12 @@ install_manifest.txt
 CMakeDoxyfile.in
 CMakeDoxygenDefaults.cmake
 Doxyfile.docs
+Doxyfile.docs-vsgImGui
 include/vsgImGui/imconfig.h
 include/vsgImGui/imgui_stdlib.h
+include/vsgImGui/imgui_internal.h
+include/vsgImGui/implot_internal.h
+include/vsgImGui/imstb_textedit.h
 vsgImGuiConfig.cmake
 vsgImGuiConfigVersion.cmake
 
