@@ -41,7 +41,7 @@ namespace vsgImGui
         vsg::error("[vulkan] Error: VkResult = ", err);
     }
 
-    class VSGIMGUI_DECLSPEC ImGuiNode : public vsg::Inherit<vsg::Node, ImGuiNode>
+    class ImGuiNode : public vsg::Inherit<vsg::Node, ImGuiNode>
     {
     public:
 
