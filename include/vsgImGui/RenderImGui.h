@@ -35,38 +35,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 namespace vsgImGui
 {
-    /// std::function signature with RecordTraverasl used vsgImGui
-    using RecordFunction = std::function<void(vsg::RecordTraversal& rt)>;
-
-    /// std::function signature used for older vsgImGui versions
-    using LegacyFunction = std::function<bool()>;
-
-    class VSGIMGUI_DECLSPEC ImGuiNode : public vsg::Inherit<vsg::Node, ImGuiNode>
-    {
-    public:
-
-        template<typename... Args>
-        ImGuiNode(Args&... args)
-        {
-            (add(args), ...);
-        };
-
-        void add(const RecordFunction& recordFunc) { recordList.push_back(recordFunc); }
-        void add(const LegacyFunction& legacyFunc) { legacyList.push_back(legacyFunc); }
-
-        std::list<RecordFunction> recordList;
-        std::list<LegacyFunction> legacyList;
-
-        void accept(vsg::RecordTraversal& rt) const override;
-    };
 
     class VSGIMGUI_DECLSPEC RenderImGui : public vsg::Inherit<vsg::Group, RenderImGui>
     {
     public:
         RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments = false);
 
-        RenderImGui(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily, 
-                   vsg::ref_ptr<vsg::RenderPass> renderPass, 
+        RenderImGui(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily,
+                   vsg::ref_ptr<vsg::RenderPass> renderPass,
                    uint32_t minImageCount, uint32_t imageCount,
                    VkExtent2D imageSize, bool useClearAttachments = false);
 
@@ -84,11 +60,11 @@ namespace vsgImGui
             (add(args), ...);
         }
 
-        /// add a GUI rendering component that provides the ImGui calls to render the required GUI elements.
-        void add(const LegacyFunction& legacyFunc) { addChild(ImGuiNode::create(legacyFunc)); }
+        /// std::function signature used for older vsgImGui versions
+        using LegacyFunction = std::function<bool()>;
 
         /// add a GUI rendering component that provides the ImGui calls to render the required GUI elements.
-        void add(const RecordFunction& recordFunc) { addChild(ImGuiNode::create(recordFunc)); }
+        void add(const LegacyFunction& legacyFunc);
 
         /// add a child, equivilant to Group::addChild(..) but adds compatibility with the RenderImGui constructor
         void add(vsg::ref_ptr<vsg::Node> child) { addChild(child); }
@@ -106,8 +82,8 @@ namespace vsgImGui
         vsg::ref_ptr<vsg::ClearAttachments> _clearAttachments;
 
         void _init(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments);
-        void _init(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily, 
-                   vsg::ref_ptr<vsg::RenderPass> renderPass, 
+        void _init(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily,
+                   vsg::ref_ptr<vsg::RenderPass> renderPass,
                    uint32_t minImageCount, uint32_t imageCount,
                    VkExtent2D imageSize, bool useClearAttachments);
         void _uploadFonts();

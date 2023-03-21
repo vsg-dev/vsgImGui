@@ -44,6 +44,7 @@ namespace vsgImGui
         ImageComponent(vsg::ref_ptr<vsg::Data> texData);
 
         void compile(vsg::Context& context) override;
+        void record(vsg::CommandBuffer& commandBuffer) const override;
 
         ImTextureID getTextureID(uint32_t deviceID) const;
         

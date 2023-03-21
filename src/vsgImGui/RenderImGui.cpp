@@ -32,7 +32,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using namespace vsgImGui;
 
-namespace
+namespace vsgImGui
 {
     void check_vk_result(VkResult err)
     {
@@ -40,14 +40,22 @@ namespace
 
         vsg::error("[vulkan] Error: VkResult = ", err);
     }
+
+    class VSGIMGUI_DECLSPEC ImGuiNode : public vsg::Inherit<vsg::Node, ImGuiNode>
+    {
+    public:
+
+        ImGuiNode(RenderImGui::LegacyFunction in_func) : func(in_func) {}
+
+        RenderImGui::LegacyFunction func;
+
+        void accept(vsg::RecordTraversal&) const override
+        {
+            func();
+        }
+    };
+
 } // namespace
-
-
-void ImGuiNode::accept(vsg::RecordTraversal& rt) const
-{
-    for(auto& func : recordList) func(rt);
-    for(auto& func : legacyList) func();
-}
 
 RenderImGui::RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
 {
@@ -70,6 +78,12 @@ RenderImGui::~RenderImGui()
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
 }
+
+void RenderImGui::add(const LegacyFunction& legacyFunc)
+{
+    addChild(ImGuiNode::create(legacyFunc));
+}
+
 
 void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
 {

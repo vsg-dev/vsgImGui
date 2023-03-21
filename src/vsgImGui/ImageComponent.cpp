@@ -70,3 +70,8 @@ ImTextureID ImageComponent::getTextureID(uint32_t deviceID) const
 {
     return static_cast<ImTextureID>(descriptorSet->vk(deviceID));
 }
+
+void ImageComponent::record(vsg::CommandBuffer&) const
+{
+//    vsg::fatal("An ImageComponent can't be recorded.");
+}
