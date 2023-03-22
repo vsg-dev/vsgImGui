@@ -32,7 +32,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using namespace vsgImGui;
 
-namespace
+namespace vsgImGui
 {
     void check_vk_result(VkResult err)
     {
@@ -40,6 +40,21 @@ namespace
 
         vsg::error("[vulkan] Error: VkResult = ", err);
     }
+
+    class ImGuiNode : public vsg::Inherit<vsg::Node, ImGuiNode>
+    {
+    public:
+
+        ImGuiNode(RenderImGui::LegacyFunction in_func) : func(in_func) {}
+
+        RenderImGui::LegacyFunction func;
+
+        void accept(vsg::RecordTraversal&) const override
+        {
+            func();
+        }
+    };
+
 } // namespace
 
 RenderImGui::RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
@@ -62,6 +77,11 @@ RenderImGui::~RenderImGui()
     ImGui_ImplVulkan_Shutdown();
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
+}
+
+void RenderImGui::add(const LegacyFunction& legacyFunc)
+{
+    addChild(ImGuiNode::create(legacyFunc));
 }
 
 void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
@@ -101,6 +121,11 @@ void RenderImGui::_init(
     ImGui::CreateContext();
     ImPlot::CreateContext();
 
+    VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT;
+    for(auto& attachment : renderPass->attachments)
+    {
+        if (attachment.samples > samples) samples = attachment.samples;
+    }
 
     // ImGui may change this later, but ensure the display
     // size is set to something, to prevent assertions
@@ -122,6 +147,7 @@ void RenderImGui::_init(
     init_info.QueueFamily = _queueFamily;
     init_info.Queue = *(_queue);  // ImGui doesn't use the queue so we shouldn't need to assign it, but it has an IM_ASSERT requiring it during debug build.
     init_info.PipelineCache = VK_NULL_HANDLE;
+    init_info.MSAASamples = samples;
 
     // Create Descriptor Pool
     vsg::DescriptorPoolSizes pool_sizes = {
@@ -184,11 +210,6 @@ void RenderImGui::_uploadFonts()
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
 
-void RenderImGui::add(const Component& component)
-{
-    _components.push_back(component);
-}
-
 void RenderImGui::accept(vsg::RecordTraversal& rt) const
 {
     auto& commandBuffer = *(rt.getState()->_commandBuffer);
@@ -197,11 +218,6 @@ void RenderImGui::accept(vsg::RecordTraversal& rt) const
     // record all the ImGui commands to ImDrawData container
     ImGui_ImplVulkan_NewFrame();
     ImGui::NewFrame();
-
-    for (auto& component : _components)
-    {
-        component();
-    }
 
     // traverse children
     traverse(rt);

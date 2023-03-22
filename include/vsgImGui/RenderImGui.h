@@ -41,8 +41,8 @@ namespace vsgImGui
     public:
         RenderImGui(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments = false);
 
-        RenderImGui(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily, 
-                   vsg::ref_ptr<vsg::RenderPass> renderPass, 
+        RenderImGui(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily,
+                   vsg::ref_ptr<vsg::RenderPass> renderPass,
                    uint32_t minImageCount, uint32_t imageCount,
                    VkExtent2D imageSize, bool useClearAttachments = false);
 
@@ -60,15 +60,14 @@ namespace vsgImGui
             (add(args), ...);
         }
 
-        using Component = std::function<bool()>;
-        using Components = std::list<Component>;
+        /// std::function signature used for older vsgImGui versions
+        using LegacyFunction = std::function<bool()>;
 
-        /// add a GUI rendering component that provides the ImGui calls to render the
-        /// required GUI elements.
-        void add(const Component& component);
+        /// add a GUI rendering component that provides the ImGui calls to render the required GUI elements.
+        void add(const LegacyFunction& legacyFunc);
 
-        Components& getComponents() { return _components; }
-        const Components& getComponents() const { return _components; }
+        /// add a child, equivilant to Group::addChild(..) but adds compatibility with the RenderImGui constructor
+        void add(vsg::ref_ptr<vsg::Node> child) { addChild(child); }
 
         void accept(vsg::RecordTraversal& rt) const override;
 
@@ -79,13 +78,12 @@ namespace vsgImGui
         uint32_t _queueFamily;
         vsg::ref_ptr<vsg::Queue> _queue;
         vsg::ref_ptr<vsg::DescriptorPool> _descriptorPool;
-        Components _components;
 
         vsg::ref_ptr<vsg::ClearAttachments> _clearAttachments;
 
         void _init(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments);
-        void _init(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily, 
-                   vsg::ref_ptr<vsg::RenderPass> renderPass, 
+        void _init(vsg::ref_ptr<vsg::Device> device, uint32_t queueFamily,
+                   vsg::ref_ptr<vsg::RenderPass> renderPass,
                    uint32_t minImageCount, uint32_t imageCount,
                    VkExtent2D imageSize, bool useClearAttachments);
         void _uploadFonts();
