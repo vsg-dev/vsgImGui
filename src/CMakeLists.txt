@@ -9,7 +9,7 @@ set(HEADERS
     ${HEADER_PATH}/imgui.h
     ${HEADER_PATH}/SendEventsToImGui.h
     ${HEADER_PATH}/RenderImGui.h
-    ${HEADER_PATH}/ImageComponent.h
+    ${HEADER_PATH}/Texture.h
     imgui/imconfig.h
     imgui/imgui_internal.h
     imgui/imstb_rectpack.h
@@ -23,7 +23,7 @@ set(HEADERS
 set(SOURCES
     vsgImGui/RenderImGui.cpp
     vsgImGui/SendEventsToImGui.cpp
-    vsgImGui/ImageComponent.cpp
+    vsgImGui/Texture.cpp
     imgui/imgui.cpp
     imgui/imgui_demo.cpp
     imgui/imgui_draw.cpp

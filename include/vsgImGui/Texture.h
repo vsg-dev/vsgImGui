@@ -24,9 +24,6 @@ SOFTWARE.
 
 #pragma once
 
-
-// A component that can render an image in Dear ImGui.
-
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/app/Window.h>
@@ -37,19 +34,23 @@ SOFTWARE.
 
 namespace vsgImGui
 {
-    // This is a subclass of command so that it can be compiled.
-    class VSGIMGUI_DECLSPEC ImageComponent : public vsg::Inherit<vsg::Command, ImageComponent>
+    /// Texture adapter that uses a DescriptorSet/DescriptorImage to hold a texture image on the GPU in a form that ImGui can use.
+    class VSGIMGUI_DECLSPEC Texture : public vsg::Inherit<vsg::Command, Texture>
     {
     public:
-        ImageComponent(vsg::ref_ptr<vsg::Data> texData);
+        Texture(vsg::ref_ptr<vsg::Data> data = {});
 
         void compile(vsg::Context& context) override;
         void record(vsg::CommandBuffer& commandBuffer) const override;
 
-        ImTextureID getTextureID(uint32_t deviceID) const;
-        
+        /// get the ImTextureID used with ImGui::Image(..) calls
+        ImTextureID id(uint32_t deviceID) const;
+
         vsg::ref_ptr<vsg::DescriptorSet> descriptorSet;
-        uint32_t height;
-        uint32_t width;
+        uint32_t height = 0;
+        uint32_t width = 0;
+
+    protected:
+        virtual ~Texture();
     };
 }
