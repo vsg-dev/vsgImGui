@@ -84,7 +84,6 @@ void RenderImGui::add(const LegacyFunction& legacyFunc)
     addChild(ImGuiNode::create(legacyFunc));
 }
 
-
 void RenderImGui::_init(const vsg::ref_ptr<vsg::Window>& window, bool useClearAttachments)
 {
     auto device = window->getOrCreateDevice();
