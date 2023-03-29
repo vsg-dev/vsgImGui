@@ -24,24 +24,19 @@ SOFTWARE.
 
 #pragma once
 
-#include <vsg/commands/Command.h>
-#include <vsg/core/Inherit.h>
-#include <vsg/app/Window.h>
-
-#include <vsgImGui/Export.h>
+#include <vsg/nodes/Compilable.h>
 
 #include <vsgImGui/RenderImGui.h>
 
 namespace vsgImGui
 {
     /// Texture adapter that uses a DescriptorSet/DescriptorImage to hold a texture image on the GPU in a form that ImGui can use.
-    class VSGIMGUI_DECLSPEC Texture : public vsg::Inherit<vsg::Command, Texture>
+    class VSGIMGUI_DECLSPEC Texture : public vsg::Inherit<vsg::Compilable, Texture>
     {
     public:
         Texture(vsg::ref_ptr<vsg::Data> data = {});
 
         void compile(vsg::Context& context) override;
-        void record(vsg::CommandBuffer& commandBuffer) const override;
 
         /// get the ImTextureID used with ImGui::Image(..) calls
         ImTextureID id(uint32_t deviceID) const;
