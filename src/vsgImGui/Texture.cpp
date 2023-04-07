@@ -77,8 +77,3 @@ ImTextureID Texture::id(uint32_t deviceID) const
 {
     return descriptorSet ? static_cast<ImTextureID>(descriptorSet->vk(deviceID)) : ImTextureID{};
 }
-
-void Texture::record(vsg::CommandBuffer&) const
-{
-    // non op
-}
