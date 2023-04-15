@@ -31,7 +31,7 @@ using namespace vsgImGui;
 
 namespace
 {
-    vsg::ref_ptr<vsg::DescriptorSet> makeImageDescriptorSet(vsg::ref_ptr<vsg::Data> data)
+    vsg::ref_ptr<vsg::DescriptorSet> makeImageDescriptorSet(vsg::ref_ptr<vsg::Data> data, VkFilter magFilter, VkFilter minFilter)
     {
         if (!data) return {};
         // set up graphics pipeline
@@ -47,6 +47,8 @@ namespace
         sampler->addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
         sampler->addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
         sampler->addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        sampler->magFilter = magFilter;
+        sampler->minFilter = minFilter;
         auto texture = vsg::DescriptorImage::create(sampler, data, 0, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
 
         auto descriptorSet = vsg::DescriptorSet::create(descriptorSetLayout, vsg::Descriptors{texture});
@@ -54,13 +56,13 @@ namespace
     }
 } // namespace
 
-Texture::Texture(vsg::ref_ptr<vsg::Data> data)
+Texture::Texture(vsg::ref_ptr<vsg::Data> data, VkFilter magFilter, VkFilter minFilter)
 {
     if (data)
     {
         height = data->height();
         width = data->width();
-        descriptorSet = makeImageDescriptorSet(data);
+        descriptorSet = makeImageDescriptorSet(data, magFilter, minFilter);
     }
 }
 

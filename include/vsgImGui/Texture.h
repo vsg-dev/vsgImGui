@@ -34,7 +34,7 @@ namespace vsgImGui
     class VSGIMGUI_DECLSPEC Texture : public vsg::Inherit<vsg::Compilable, Texture>
     {
     public:
-        Texture(vsg::ref_ptr<vsg::Data> data = {});
+        Texture(vsg::ref_ptr<vsg::Data> data = {}, VkFilter magFilter = VK_FILTER_LINEAR, VkFilter minFilter = VK_FILTER_LINEAR);
 
         void compile(vsg::Context& context) override;
 
