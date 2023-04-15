@@ -1,5 +1,5 @@
 # vsgImGui
-Library that integrates VulkanSceneGraph with ImGui
+Library that integrates VulkanSceneGraph with [Dear ImGui](https://github.com/ocornut/imgui) & [ImPlot](https://github.com/epezent/implot).
 
 ## Checking out vsgImGui
 
@@ -7,7 +7,7 @@ Library that integrates VulkanSceneGraph with ImGui
 
 ## Building vsgImGui
 
-The first run of cmake will automatically checkout imgui as a submodule when required.
+The first run of cmake will automatically checkout ImGui and ImPlot and as a submodules when required.
 
     cd vsgImGui
     cmake .
