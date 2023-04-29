@@ -25,6 +25,7 @@ SOFTWARE.
 #pragma once
 
 #include <vsg/nodes/Compilable.h>
+#include <vsg/state/Sampler.h>
 
 #include <vsgImGui/RenderImGui.h>
 
@@ -34,7 +35,7 @@ namespace vsgImGui
     class VSGIMGUI_DECLSPEC Texture : public vsg::Inherit<vsg::Compilable, Texture>
     {
     public:
-        Texture(vsg::ref_ptr<vsg::Data> data = {}, VkFilter magFilter = VK_FILTER_LINEAR, VkFilter minFilter = VK_FILTER_LINEAR);
+        Texture(vsg::ref_ptr<vsg::Data> data = {}, vsg::ref_ptr<vsg::Sampler> sampler = {});
 
         void compile(vsg::Context& context) override;
 
@@ -48,4 +49,4 @@ namespace vsgImGui
     protected:
         virtual ~Texture();
     };
-}
+} // namespace vsgImGui
