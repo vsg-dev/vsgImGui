@@ -22,8 +22,8 @@ SOFTWARE.
 
 </editor-fold> */
 
-#include <vsgImGui/Texture.h>
 #include <vsgImGui/RenderImGui.h>
+#include <vsgImGui/Texture.h>
 
 #include <vsg/state/DescriptorImage.h>
 
@@ -31,7 +31,17 @@ using namespace vsgImGui;
 
 namespace
 {
-    vsg::ref_ptr<vsg::DescriptorSet> makeImageDescriptorSet(vsg::ref_ptr<vsg::Data> data)
+    auto getDefaultSampler()
+    {
+        auto sampler = vsg::Sampler::create();
+        sampler->maxLod = 9.0; // whatever for now
+        sampler->addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        sampler->addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        sampler->addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        return sampler;
+    }
+
+    vsg::ref_ptr<vsg::DescriptorSet> makeImageDescriptorSet(vsg::ref_ptr<vsg::Data> data, vsg::ref_ptr<vsg::Sampler> sampler = {})
     {
         if (!data) return {};
         // set up graphics pipeline
@@ -42,11 +52,10 @@ namespace
 
         auto descriptorSetLayout = vsg::DescriptorSetLayout::create(descriptorBindings);
         // create texture image and associated DescriptorSets and binding
-        auto sampler = vsg::Sampler::create();
-        sampler->maxLod = 9.0;      // whatever for now
-        sampler->addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-        sampler->addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-        sampler->addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        if (!sampler)
+        {
+            sampler = getDefaultSampler();
+        }
         auto texture = vsg::DescriptorImage::create(sampler, data, 0, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
 
         auto descriptorSet = vsg::DescriptorSet::create(descriptorSetLayout, vsg::Descriptors{texture});
@@ -54,13 +63,13 @@ namespace
     }
 } // namespace
 
-Texture::Texture(vsg::ref_ptr<vsg::Data> data)
+Texture::Texture(vsg::ref_ptr<vsg::Data> data, vsg::ref_ptr<vsg::Sampler> sampler)
 {
     if (data)
     {
         height = data->height();
         width = data->width();
-        descriptorSet = makeImageDescriptorSet(data);
+        descriptorSet = makeImageDescriptorSet(data, sampler);
     }
 }
 
