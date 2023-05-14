@@ -134,8 +134,6 @@ void RenderImGui::_init(
     io.DisplaySize.x = imageSize.width;
     io.DisplaySize.y = imageSize.height;
 
-    ImGui::StyleColorsDark();
-
     _device = device;
     _queueFamily = queueFamily;
     _queue = _device->getQueue(_queueFamily);
