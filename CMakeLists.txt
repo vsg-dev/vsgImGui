@@ -53,7 +53,9 @@ vsg_copy_imgui_headers(
 
 vsg_add_target_clang_format(
     FILES
-        include/vsgImGui/*.h
+        include/vsgImGui/RenderImGui.h
+        include/vsgImGui/SendEventsToImGui.h
+        include/vsgImGui/Texture.h
         src/vsgImGui/*.cpp
 )
 vsg_add_target_clobber()

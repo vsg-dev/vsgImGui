@@ -241,7 +241,7 @@ void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
 {
     ImGuiIO& io = ImGui::GetIO();
 
-    if(io.WantCaptureKeyboard)
+    if (io.WantCaptureKeyboard)
     {
         _updateModifier(io, keyPress.keyModifier, true);
         if (keyPress.keyModified >= vsg::KEY_KP_0 && keyPress.keyModified <= vsg::KEY_KP_9) keyPress.keyBase = keyPress.keyModified;
@@ -273,9 +273,9 @@ void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     ImGuiIO& io = ImGui::GetIO();
 
-    // io.WantCaptureKeyboard becomes false when Enter is PRESSED. 
+    // io.WantCaptureKeyboard becomes false when Enter is PRESSED.
     // We therefore have to also test for Enter to be RELEASED here to prevent undesirable behaviour when next entering a text edit box
-    if(io.WantCaptureKeyboard || keyRelease.keyBase == vsg::KeySymbol::KEY_Return || keyRelease.keyBase == vsg::KeySymbol::KEY_KP_Enter)
+    if (io.WantCaptureKeyboard || keyRelease.keyBase == vsg::KeySymbol::KEY_Return || keyRelease.keyBase == vsg::KeySymbol::KEY_KP_Enter)
     {
         _updateModifier(io, keyRelease.keyModifier, false);
         if (keyRelease.keyModified >= vsg::KEY_KP_0 && keyRelease.keyModified <= vsg::KEY_KP_9) keyRelease.keyBase = keyRelease.keyModified;

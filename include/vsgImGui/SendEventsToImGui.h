@@ -45,7 +45,6 @@ namespace vsgImGui
         void apply(vsg::KeyReleaseEvent& keyRelease) override;
         void apply(vsg::ConfigureWindowEvent& configureWindow) override;
         void apply(vsg::FrameEvent& frame) override;
-        
 
     protected:
         ~SendEventsToImGui();
