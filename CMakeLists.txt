@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.7)
 
 project(vsgImGui
     VERSION 0.1.0
-    DESCRIPTION "VulkanSceneGraph 3rd party data integration library"
+    DESCRIPTION "VulkanSceneGraph, ImGui and ImPlot integration library"
     LANGUAGES CXX
 )
 set(VSGIMGUI_SOVERSION 0)
@@ -74,7 +74,7 @@ vsg_add_target_uninstall()
 if (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
 
     vsg_add_option_maintainer(
-        PREFIX vsgImGui
+        PREFIX v
         RCLEVEL ${VSGIMGUI_RELEASE_CANDIDATE}
     )
 
