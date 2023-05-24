@@ -75,7 +75,7 @@ if (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
 
     vsg_add_option_maintainer(
         PREFIX vsgImGui
-        RCLEVEL VSGIMGUI_RELEASE_CANDIDATE
+        RCLEVEL ${VSGIMGUI_RELEASE_CANDIDATE}
     )
 
 endif()
