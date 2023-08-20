@@ -66,7 +66,7 @@ namespace vsgImGui
         /// add a GUI rendering component that provides the ImGui calls to render the required GUI elements.
         void add(const LegacyFunction& legacyFunc);
 
-        /// add a child, equivilant to Group::addChild(..) but adds compatibility with the RenderImGui constructor
+        /// add a child, equivalent to Group::addChild(..) but adds compatibility with the RenderImGui constructor
         void add(vsg::ref_ptr<vsg::Node> child) { addChild(child); }
 
         void accept(vsg::RecordTraversal& rt) const override;
