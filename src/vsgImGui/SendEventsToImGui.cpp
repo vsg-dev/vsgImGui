@@ -258,7 +258,7 @@ void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
         }
         io.AddKeyEvent(imguiKey, true);
 
-        // Irrespective of whether we recognize the vsg key witin _vsg2imgui, if its an ascii character, we add it as an input character.
+        // Irrespective of whether we recognize the vsg key witin _vsg2imgui, if it's an ascii character, we add it as an input character.
         // If other characters should be allowed please raise an issue and pull request.
         // Adding as an input character on KeyPress allows user to repeat the values until release.
         if (uint16_t c = keyPress.keyModified; c > 0 && c < 255)
