@@ -15,4 +15,4 @@ The first run of cmake will automatically checkout ImGui and ImPlot as submodule
 
 ## Example
 
-The [vsgExamples](https://github.com/vsg-dev/vsgExamples.git) repository provides the [vsgimgui](https://github.com/vsg-dev/vsgExamples/tree/master/examples/ui/vsgimgui) example.
+The [vsgExamples](https://github.com/vsg-dev/vsgExamples.git) repository provides the [vsgimgui](https://github.com/vsg-dev/vsgExamples/blob/master/examples/ui/vsgimgui_example) example.
