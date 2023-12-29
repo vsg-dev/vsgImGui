@@ -118,8 +118,8 @@ void RenderImGui::_init(
     VkExtent2D imageSize, bool useClearAttachments)
 {
     IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImPlot::CreateContext();
+    //ImGui::CreateContext();
+    //ImPlot::CreateContext();
 
     VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT;
     for (auto& attachment : renderPass->attachments)
