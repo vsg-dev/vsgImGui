@@ -25,17 +25,27 @@ set(SOURCES
     vsgImGui/SendEventsToImGui.cpp
     vsgImGui/Texture.cpp
     imgui/imgui.cpp
-    imgui/imgui_demo.cpp
     imgui/imgui_draw.cpp
     imgui/imgui_tables.cpp
     imgui/imgui_widgets.cpp
     imgui/backends/imgui_impl_vulkan.cpp
     imgui/misc/cpp/imgui_stdlib.cpp
     implot/implot.cpp
-    implot/implot_demo.cpp
     implot/implot_items.cpp
 )
 
+OPTION(SHOW_DEMO_WINDOW "Toggle the build of the ImGui::ShowDemoWindow(bool*) and ImPlot::ShadowDemoWindow(bool*)" ON)
+
+if (SHOW_DEMO_WINDOW)
+    set(SOURCES ${SOURCES}
+        imgui/imgui_demo.cpp
+        implot/implot_demo.cpp
+    )
+else()
+    set(SOURCES ${SOURCES}
+        vsgImGui/fallback_demo.cpp
+    )
+endif()
 
 add_library(vsgImGui ${HEADERS} ${SOURCES})
 
