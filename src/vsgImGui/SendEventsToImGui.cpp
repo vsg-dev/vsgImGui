@@ -266,7 +266,7 @@ void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
     }
 
     // If ImGui was expecting the keyboard event then we mark it as handled
-    if (io.WantCaptureKeyboard) keyPress.handled = true;
+    keyPress.handled = io.WantCaptureKeyboard;
 }
 
 void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
@@ -292,7 +292,7 @@ void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
     io.AddKeyEvent(imguiKey, false);
 
     // If ImGui was expecting the keyboard event then we mark it as handled
-    if (io.WantCaptureKeyboard) keyRelease.handled = true;
+    keyRelease.handled = io.WantCaptureKeyboard;
 }
 
 void SendEventsToImGui::apply(vsg::ConfigureWindowEvent& configureWindow)
