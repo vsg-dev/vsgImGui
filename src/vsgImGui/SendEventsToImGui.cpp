@@ -241,60 +241,58 @@ void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
 {
     ImGuiIO& io = ImGui::GetIO();
 
-    if (io.WantCaptureKeyboard)
+    // We should always pass the event to ImGui
+    _updateModifier(io, keyPress.keyModifier, true);
+    if (keyPress.keyModified >= vsg::KEY_KP_0 && keyPress.keyModified <= vsg::KEY_KP_9) keyPress.keyBase = keyPress.keyModified;
+    auto itr = _vsg2imgui.find(keyPress.keyBase);
+    auto imguiKey = ImGuiKey_None;
+    if (itr != _vsg2imgui.end())
     {
-        _updateModifier(io, keyPress.keyModifier, true);
-        if (keyPress.keyModified >= vsg::KEY_KP_0 && keyPress.keyModified <= vsg::KEY_KP_9) keyPress.keyBase = keyPress.keyModified;
-        auto itr = _vsg2imgui.find(keyPress.keyBase);
-        auto imguiKey = ImGuiKey_None;
-        if (itr != _vsg2imgui.end())
-        {
-            imguiKey = itr->second;
-        }
-        else
-        {
-            // This particular VSG key is not handled. If it should be, please raise an issue or a pull request.
-            imguiKey = ImGuiKey_None;
-        }
-        io.AddKeyEvent(imguiKey, true);
-
-        // Irrespective of whether we recognize the vsg key witin _vsg2imgui, if it's an ascii character, we add it as an input character.
-        // If other characters should be allowed please raise an issue and pull request.
-        // Adding as an input character on KeyPress allows user to repeat the values until release.
-        if (uint16_t c = keyPress.keyModified; c > 0 && c < 255)
-        {
-            io.AddInputCharacter(c);
-        }
-        keyPress.handled = true;
+        imguiKey = itr->second;
     }
+    else
+    {
+        // This particular VSG key is not handled. If it should be, please raise an issue or a pull request.
+        imguiKey = ImGuiKey_None;
+    }
+    io.AddKeyEvent(imguiKey, true);
+
+    // Irrespective of whether we recognize the vsg key witin _vsg2imgui, if it's an ascii character, we add it as an input character.
+    // If other characters should be allowed please raise an issue and pull request.
+    // Adding as an input character on KeyPress allows user to repeat the values until release.
+    if (uint16_t c = keyPress.keyModified; c > 0 && c < 255)
+    {
+        io.AddInputCharacter(c);
+    }
+
+    // If ImGui was expecting the keyboard event then we mark it as handled
+    if (io.WantCaptureKeyboard) keyPress.handled = true;
 }
 
 void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     ImGuiIO& io = ImGui::GetIO();
 
-    // io.WantCaptureKeyboard becomes false when Enter is PRESSED.
-    // We therefore have to also test for Enter to be RELEASED here to prevent undesirable behaviour when next entering a text edit box
-    if (io.WantCaptureKeyboard || keyRelease.keyBase == vsg::KeySymbol::KEY_Return || keyRelease.keyBase == vsg::KeySymbol::KEY_KP_Enter)
+    // We should always pass the event to ImGui
+    _updateModifier(io, keyRelease.keyModifier, false);
+    if (keyRelease.keyModified >= vsg::KEY_KP_0 && keyRelease.keyModified <= vsg::KEY_KP_9) keyRelease.keyBase = keyRelease.keyModified;
+    auto itr = _vsg2imgui.find(keyRelease.keyBase);
+
+    auto imguiKey = ImGuiKey_None;
+    if (itr != _vsg2imgui.end())
     {
-        _updateModifier(io, keyRelease.keyModifier, false);
-        if (keyRelease.keyModified >= vsg::KEY_KP_0 && keyRelease.keyModified <= vsg::KEY_KP_9) keyRelease.keyBase = keyRelease.keyModified;
-        auto itr = _vsg2imgui.find(keyRelease.keyBase);
-
-        auto imguiKey = ImGuiKey_None;
-        if (itr != _vsg2imgui.end())
-        {
-            imguiKey = itr->second;
-        }
-        else
-        {
-            // This particular VSG key is not handled. If it should be, please raise an issue or a pull request.
-            imguiKey = ImGuiKey_None;
-        }
-
-        io.AddKeyEvent(imguiKey, false);
-        keyRelease.handled = true;
+        imguiKey = itr->second;
     }
+    else
+    {
+        // This particular VSG key is not handled. If it should be, please raise an issue or a pull request.
+        imguiKey = ImGuiKey_None;
+    }
+
+    io.AddKeyEvent(imguiKey, false);
+
+    // If ImGui was expecting the keyboard event then we mark it as handled
+    if (io.WantCaptureKeyboard) keyRelease.handled = true;
 }
 
 void SendEventsToImGui::apply(vsg::ConfigureWindowEvent& configureWindow)
