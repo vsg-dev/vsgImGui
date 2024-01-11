@@ -185,26 +185,7 @@ void RenderImGui::_init(
 
 void RenderImGui::_uploadFonts()
 {
-    auto commandPool = vsg::CommandPool::create(_device, _queueFamily, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT);
-    auto fence = vsg::Fence::create(_device);
-
-    uint64_t timeout = 1000000000;
-    vsg::submitCommandsToQueue(commandPool, fence, timeout, _queue, [&](vsg::CommandBuffer& commandBuffer) {
-        ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
-    });
-
-    VkResult result = fence->status();
-    while (result == VK_NOT_READY)
-    {
-        result = fence->wait(timeout);
-    }
-
-    if (result != VK_SUCCESS)
-    {
-        vsg::error("RenderImGui::_uploadFonts(), fence->state() = ", result);
-    }
-
-    ImGui_ImplVulkan_DestroyFontUploadObjects();
+    ImGui_ImplVulkan_CreateFontsTexture();
 }
 
 void RenderImGui::accept(vsg::RecordTraversal& rt) const
