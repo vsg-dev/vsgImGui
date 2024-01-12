@@ -87,3 +87,4 @@ build/
 local.properties
 
 *imgui.ini
+/CMakeSettings.json
