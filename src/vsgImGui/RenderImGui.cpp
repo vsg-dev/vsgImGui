@@ -131,8 +131,8 @@ void RenderImGui::_init(
     // size is set to something, to prevent assertions
     // in ImGui::newFrame.
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize.x = imageSize.width;
-    io.DisplaySize.y = imageSize.height;
+    io.DisplaySize.x = static_cast<float>(imageSize.width);
+    io.DisplaySize.y = static_cast<float>(imageSize.height);
 
     _device = device;
     _queueFamily = queueFamily;
@@ -161,7 +161,7 @@ void RenderImGui::_init(
         {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
         {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}};
 
-    uint32_t maxSets = 1000 * pool_sizes.size();
+    uint32_t maxSets = static_cast<uint32_t>(1000 * pool_sizes.size());
     _descriptorPool = vsg::DescriptorPool::create(_device, maxSets, pool_sizes);
 
     init_info.DescriptorPool = *(_descriptorPool);
