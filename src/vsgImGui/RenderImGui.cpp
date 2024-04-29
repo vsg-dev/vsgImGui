@@ -164,13 +164,14 @@ void RenderImGui::_init(
     uint32_t maxSets = static_cast<uint32_t>(1000 * pool_sizes.size());
     _descriptorPool = vsg::DescriptorPool::create(_device, maxSets, pool_sizes);
 
-    init_info.DescriptorPool = *(_descriptorPool);
+    init_info.DescriptorPool = *_descriptorPool;
+    init_info.RenderPass = *renderPass;
     init_info.Allocator = nullptr;
     init_info.MinImageCount = std::max(minImageCount, 2u); // ImGui's Vulkan backend has an assert that requires MinImageCount to be 2 or more.
     init_info.ImageCount = imageCount;
     init_info.CheckVkResultFn = check_vk_result;
 
-    ImGui_ImplVulkan_Init(&init_info, *renderPass);
+    ImGui_ImplVulkan_Init(&init_info);
 
     if (useClearAttachments)
     {
