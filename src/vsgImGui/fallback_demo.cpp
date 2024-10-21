@@ -25,10 +25,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 namespace ImGui
 {
-    void ShowDemoWindow(bool* p_open) { vsg::warn("ImGui::ShowDemoWindow() not supported by build of vsgImGui."); *p_open = false; }
-}
+    void ShowDemoWindow(bool* p_open)
+    {
+        vsg::warn("ImGui::ShowDemoWindow() not supported by build of vsgImGui.");
+        *p_open = false;
+    }
+} // namespace ImGui
 
 namespace ImPlot
 {
-    void ShowDemoWindow(bool* p_open) { vsg::warn("ImPlot::ShowDemoWindow() not supported by build of vsgImGui."); *p_open = false; }
-}
+    void ShowDemoWindow(bool* p_open)
+    {
+        vsg::warn("ImPlot::ShowDemoWindow() not supported by build of vsgImGui.");
+        *p_open = false;
+    }
+} // namespace ImPlot
