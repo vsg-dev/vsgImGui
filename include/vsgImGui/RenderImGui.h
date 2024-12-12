@@ -89,6 +89,9 @@ namespace vsgImGui
         void _uploadFonts();
     };
 
+    // temporary workaround for Dear ImGui's nonexistent sRGB awareness
+    extern VSGIMGUI_DECLSPEC void ImGuiStyle_sRGB_to_linear(ImGuiStyle& style);
+
 } // namespace vsgImGui
 
 EVSG_type_name(vsgImGui::RenderImGui);

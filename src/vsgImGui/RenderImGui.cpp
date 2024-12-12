@@ -27,6 +27,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "../imgui/backends/imgui_impl_vulkan.h"
 
 #include <vsg/io/Logger.h>
+#include <vsg/maths/color.h>
 #include <vsg/vk/State.h>
 #include <vsg/vk/SubmitCommands.h>
 
@@ -54,6 +55,15 @@ namespace vsgImGui
             func();
         }
     };
+
+    void ImGuiStyle_sRGB_to_linear(ImGuiStyle& style)
+    {
+        for (size_t i = 0; i < ImGuiCol_COUNT; ++i)
+        {
+            ImVec4& color = style.Colors[i];
+            color = vsg::sRGB_to_linear<float>(color);
+        }
+    }
 
 } // namespace vsgImGui
 
@@ -118,7 +128,11 @@ void RenderImGui::_init(
     VkExtent2D imageSize, bool useClearAttachments)
 {
     IMGUI_CHECKVERSION();
-    if (!ImGui::GetCurrentContext()) ImGui::CreateContext();
+    if (!ImGui::GetCurrentContext())
+    {
+        ImGui::CreateContext();
+        ImGuiStyle_sRGB_to_linear(ImGui::GetStyle());
+    }
     if (!ImPlot::GetCurrentContext()) ImPlot::CreateContext();
 
     VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT;
