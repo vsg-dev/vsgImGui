@@ -28,6 +28,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <vsg/io/Logger.h>
 #include <vsg/maths/color.h>
+#include <vsg/utils/CoordinateSpace.h>
 #include <vsg/vk/State.h>
 #include <vsg/vk/SubmitCommands.h>
 
