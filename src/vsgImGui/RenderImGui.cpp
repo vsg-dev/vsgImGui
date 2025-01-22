@@ -129,11 +129,29 @@ void RenderImGui::_init(
     VkExtent2D imageSize, bool useClearAttachments)
 {
     IMGUI_CHECKVERSION();
+
     if (!ImGui::GetCurrentContext())
     {
         ImGui::CreateContext();
+    }
+
+    bool sRGB = false;
+    for (auto& attachment : renderPass->attachments)
+    {
+        if (attachment.finalLayout==VK_IMAGE_LAYOUT_PRESENT_SRC_KHR || attachment.finalLayout==VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+        {
+            if (attachment.format == VK_FORMAT_B8G8R8_SRGB ||
+                attachment.format == VK_FORMAT_B8G8R8A8_SRGB ||
+                attachment.format == VK_FORMAT_R8G8B8_SRGB ||
+                attachment.format == VK_FORMAT_R8G8B8A8_SRGB) sRGB = true;
+        }
+    }
+
+    if (sRGB)
+    {
         ImGuiStyle_sRGB_to_linear(ImGui::GetStyle());
     }
+
     if (!ImPlot::GetCurrentContext()) ImPlot::CreateContext();
 
     VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT;
