@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.7)
 
 project(vsgImGui
-    VERSION 0.6.0
+    VERSION 0.7.0
     DESCRIPTION "VulkanSceneGraph, ImGui and ImPlot integration library"
     LANGUAGES CXX
 )
