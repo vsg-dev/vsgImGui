@@ -6,41 +6,60 @@ set(EXTRA_INCLUDES)
 SET(HEADER_PATH ${VSGIMGUI_SOURCE_DIR}/include/vsgImGui)
 
 set(HEADERS
-    ${HEADER_PATH}/imgui.h
     ${HEADER_PATH}/SendEventsToImGui.h
     ${HEADER_PATH}/RenderImGui.h
     ${HEADER_PATH}/Texture.h
-    imgui/imconfig.h
-    imgui/imgui_internal.h
-    imgui/imstb_rectpack.h
-    imgui/imstb_textedit.h
-    imgui/imstb_truetype.h
-    imgui/misc/cpp/imgui_stdlib.h
-    implot/implot.h
-    implot/implot_internal.h
 )
 
 set(SOURCES
     vsgImGui/RenderImGui.cpp
     vsgImGui/SendEventsToImGui.cpp
     vsgImGui/Texture.cpp
-    imgui/imgui.cpp
-    imgui/imgui_draw.cpp
-    imgui/imgui_tables.cpp
-    imgui/imgui_widgets.cpp
-    imgui/backends/imgui_impl_vulkan.cpp
-    imgui/misc/cpp/imgui_stdlib.cpp
-    implot/implot.cpp
-    implot/implot_items.cpp
 )
+
+if(NOT VSG_IMGUI_USE_SYSTEM_IMGUI)
+    set(HEADERS ${HEADERS}
+        imgui/imgui.h
+        imgui/imconfig.h
+        imgui/imgui_internal.h
+        imgui/imstb_rectpack.h
+        imgui/imstb_textedit.h
+        imgui/imstb_truetype.h
+        imgui/misc/cpp/imgui_stdlib.h
+    )
+
+    set(SOURCES ${SOURCES}
+        imgui/imgui.cpp
+        imgui/imgui_draw.cpp
+        imgui/imgui_tables.cpp
+        imgui/imgui_widgets.cpp
+        imgui/backends/imgui_impl_vulkan.cpp
+        imgui/misc/cpp/imgui_stdlib.cpp
+    )
+endif()
+
+if(NOT VSG_IMGUI_USE_SYSTEM_IMPLOT)
+    set(HEADERS ${HEADERS}
+        implot/implot.h
+        implot/implot_internal.h
+    )
+
+    set(SOURCES ${SOURCES}
+        implot/implot.cpp
+        implot/implot_items.cpp
+    )
+endif()
 
 OPTION(SHOW_DEMO_WINDOW "Toggle the build of the ImGui::ShowDemoWindow(bool*) and ImPlot::ShadowDemoWindow(bool*)" ON)
 
 if (SHOW_DEMO_WINDOW)
-    set(SOURCES ${SOURCES}
-        imgui/imgui_demo.cpp
-        implot/implot_demo.cpp
-    )
+    if(NOT VSG_IMGUI_USE_SYSTEM_IMGUI)
+        set(HEADERS ${HEADERS} imgui/imgui_demo.cpp)
+    endif()
+
+    if(NOT VSG_IMGUI_USE_SYSTEM_IMPLOT)
+        set(SOURCES ${SOURCES} implot/implot_demo.cpp)
+    endif()
 else()
     set(SOURCES ${SOURCES}
         vsgImGui/fallback_demo.cpp
@@ -69,6 +88,11 @@ target_include_directories(vsgImGui PUBLIC
     $<INSTALL_INTERFACE:include>
     ${EXTRA_INCLUDES}
 )
+if(NOT VSG_IMGUI_USE_SYSTEM_IMGUI)
+    target_include_directories(vsgImGui PRIVATE
+        $<BUILD_INTERFACE:${VSGIMGUI_SOURCE_DIR}/src/imgui/backends>
+    )
+endif()
 
 target_link_libraries(vsgImGui
     PUBLIC
@@ -76,6 +100,14 @@ target_link_libraries(vsgImGui
     PRIVATE
         ${EXTRA_LIBRARIES}
 )
+
+if(VSG_IMGUI_USE_SYSTEM_IMGUI)
+    target_link_libraries(vsgImGui PUBLIC imgui::imgui)
+endif()
+
+if(VSG_IMGUI_USE_SYSTEM_IMPLOT)
+    target_link_libraries(vsgImGui PUBLIC implot::implot)
+endif()
 
 install(TARGETS vsgImGui ${INSTALL_TARGETS_DEFAULT_FLAGS})
 

@@ -22,9 +22,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 </editor-fold> */
 
 #include <vsgImGui/RenderImGui.h>
-#include <vsgImGui/implot.h>
+#include <implot.h>
 
-#include "../imgui/backends/imgui_impl_vulkan.h"
+#include <imgui_impl_vulkan.h>
 
 #include <vsg/io/Logger.h>
 #include <vsg/vk/State.h>
