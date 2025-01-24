@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.7)
 
 project(vsgImGui
-    VERSION 0.6.0
+    VERSION 0.7.0
     DESCRIPTION "VulkanSceneGraph, ImGui and ImPlot integration library"
     LANGUAGES CXX
 )
@@ -22,7 +22,7 @@ if (VULKAN_SDK)
     set(ENV{VULKAN_SDK} ${VULKAN_SDK})
 endif()
 
-find_package(vsg 1.0.5)
+find_package(vsg 1.1.10)
 
 vsg_setup_dir_vars()
 vsg_setup_build_vars()
