@@ -243,8 +243,9 @@ void SendEventsToImGui::apply(vsg::KeyPressEvent& keyPress)
 
     // We should always pass the event to ImGui
     _updateModifier(io, keyPress.keyModifier, true);
-    if (keyPress.keyModified >= vsg::KEY_KP_0 && keyPress.keyModified <= vsg::KEY_KP_9) keyPress.keyBase = keyPress.keyModified;
-    auto itr = _vsg2imgui.find(keyPress.keyBase);
+    vsg::KeySymbol key = keyPress.keyBase;
+    if (keyPress.keyModified >= vsg::KEY_KP_0 && keyPress.keyModified <= vsg::KEY_KP_9) key = keyPress.keyModified;
+    auto itr = _vsg2imgui.find(key);
     auto imguiKey = ImGuiKey_None;
     if (itr != _vsg2imgui.end())
     {
@@ -275,8 +276,9 @@ void SendEventsToImGui::apply(vsg::KeyReleaseEvent& keyRelease)
 
     // We should always pass the event to ImGui
     _updateModifier(io, keyRelease.keyModifier, false);
-    if (keyRelease.keyModified >= vsg::KEY_KP_0 && keyRelease.keyModified <= vsg::KEY_KP_9) keyRelease.keyBase = keyRelease.keyModified;
-    auto itr = _vsg2imgui.find(keyRelease.keyBase);
+    vsg::KeySymbol key = keyRelease.keyBase;
+    if (keyRelease.keyModified >= vsg::KEY_KP_0 && keyRelease.keyModified <= vsg::KEY_KP_9) key = keyRelease.keyModified;
+    auto itr = _vsg2imgui.find(key);
 
     auto imguiKey = ImGuiKey_None;
     if (itr != _vsg2imgui.end())
