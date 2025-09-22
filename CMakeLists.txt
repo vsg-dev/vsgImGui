@@ -5,6 +5,10 @@ project(vsgImGui
     DESCRIPTION "VulkanSceneGraph, ImGui and ImPlot integration library"
     LANGUAGES CXX
 )
+
+option(VSG_IMGUI_USE_SYSTEM_IMGUI "Use system installed ImGui" OFF)
+option(VSG_IMGUI_USE_SYSTEM_IMPLOT "Use system installed ImPlot" OFF)
+
 set(VSGIMGUI_SOVERSION 0)
 SET(VSGIMGUI_RELEASE_CANDIDATE 0)
 
@@ -27,29 +31,43 @@ find_package(vsg 1.1.10)
 vsg_setup_dir_vars()
 vsg_setup_build_vars()
 
-if ( (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui.h) OR
-     (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/implot/implot.h) )
-    find_package(Git QUIET)
+if(NOT VSG_IMGUI_USE_SYSTEM_IMGUI OR NOT VSG_IMGUI_USE_SYSTEM_IMPLOT)
+    if ( (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui.h) OR
+        (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/implot/implot.h) )
+        find_package(Git QUIET)
 
-    execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                    RESULT_VARIABLE GIT_SUBMOD_RESULT)
+        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
 
-    if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-        message(FATAL_ERROR "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+            message(FATAL_ERROR "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+        endif()
     endif()
 endif()
 
-vsg_copy_imgui_headers(
-    FILES
-        ${VSGIMGUI_SOURCE_DIR}/src/imgui/imgui.h
-        ${VSGIMGUI_SOURCE_DIR}/src/imgui/imconfig.h
-        ${VSGIMGUI_SOURCE_DIR}/src/imgui/imgui_internal.h
-        ${VSGIMGUI_SOURCE_DIR}/src/imgui/imstb_textedit.h
-        ${VSGIMGUI_SOURCE_DIR}/src/imgui//misc/cpp/imgui_stdlib.h
-        ${VSGIMGUI_SOURCE_DIR}/src/implot/implot.h
-        ${VSGIMGUI_SOURCE_DIR}/src/implot/implot_internal.h
-)
+if(VSG_IMGUI_USE_SYSTEM_IMGUI)
+    find_package(imgui CONFIG REQUIRED)
+else()
+    vsg_copy_imgui_headers(
+        FILES
+            ${VSGIMGUI_SOURCE_DIR}/src/imgui/imgui.h
+            ${VSGIMGUI_SOURCE_DIR}/src/imgui/imconfig.h
+            ${VSGIMGUI_SOURCE_DIR}/src/imgui/imgui_internal.h
+            ${VSGIMGUI_SOURCE_DIR}/src/imgui/imstb_textedit.h
+            ${VSGIMGUI_SOURCE_DIR}/src/imgui//misc/cpp/imgui_stdlib.h
+    )
+endif()
+
+if(VSG_IMGUI_USE_SYSTEM_IMPLOT)
+    find_package(implot CONFIG REQUIRED)
+else()
+    vsg_copy_imgui_headers(
+        FILES
+            ${VSGIMGUI_SOURCE_DIR}/src/implot/implot.h
+            ${VSGIMGUI_SOURCE_DIR}/src/implot/implot_internal.h
+    )
+endif()
 
 vsg_add_target_clang_format(
     FILES
