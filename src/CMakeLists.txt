@@ -86,6 +86,7 @@ target_include_directories(vsgImGui PUBLIC
     $<BUILD_INTERFACE:${VSGIMGUI_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${VSGIMGUI_SOURCE_DIR}/include/vsgImGui>
     $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:include/vsgImGui>
     ${EXTRA_INCLUDES}
 )
 if(NOT VSG_IMGUI_USE_SYSTEM_IMGUI)
