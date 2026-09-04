@@ -27,10 +27,25 @@ SOFTWARE.
 
 #include <vsg/state/DescriptorImage.h>
 
+#include <cstdint>
+
 using namespace vsgImGui;
 
 namespace
 {
+    ImTextureID descriptorSetToTextureID(VkDescriptorSet descriptorSet)
+    {
+#ifdef VSG_IMGUI_USE_SYSTEM_IMGUI
+#    if VK_USE_64_BIT_PTR_DEFINES == 1
+        return static_cast<ImTextureID>(reinterpret_cast<std::uintptr_t>(descriptorSet));
+#    else
+        return static_cast<ImTextureID>(descriptorSet);
+#    endif
+#else
+        return static_cast<ImTextureID>(descriptorSet);
+#endif
+    }
+
     auto getDefaultSampler()
     {
         auto sampler = vsg::Sampler::create();
@@ -84,5 +99,5 @@ void Texture::compile(vsg::Context& context)
 
 ImTextureID Texture::id(uint32_t deviceID) const
 {
-    return descriptorSet ? static_cast<ImTextureID>(descriptorSet->vk(deviceID)) : ImTextureID{};
+    return descriptorSet ? descriptorSetToTextureID(descriptorSet->vk(deviceID)) : ImTextureID{};
 }

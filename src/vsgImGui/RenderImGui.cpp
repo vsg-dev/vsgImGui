@@ -24,7 +24,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <vsgImGui/RenderImGui.h>
 #include <vsgImGui/implot.h>
 
-#include "../imgui/backends/imgui_impl_vulkan.h"
+#include <imgui_impl_vulkan.h>
 
 #include <vsg/io/Logger.h>
 #include <vsg/maths/color.h>

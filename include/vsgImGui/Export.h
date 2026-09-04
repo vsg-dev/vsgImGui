@@ -35,17 +35,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #    define VSGIMGUI_DECLSPEC
 #endif
 
-// Fix in-tree build warning C4005 - macro redefinition
-#if defined(IMGUI_API) || defined(IMPLOT_API)
-#    undef IMGUI_API
-#    undef IMPLOT_API
+#ifndef VSG_IMGUI_USE_SYSTEM_IMGUI
+#    ifdef IMGUI_API
+#        undef IMGUI_API
+#    endif
+#    define IMGUI_API VSGIMGUI_DECLSPEC
+#endif
+#ifndef VSG_IMGUI_USE_SYSTEM_IMPLOT
+#    ifdef IMPLOT_API
+#        undef IMPLOT_API
+#    endif
+#    define IMPLOT_API VSGIMGUI_DECLSPEC
 #endif
 
-#define IMGUI_API VSGIMGUI_DECLSPEC
-#define IMPLOT_API VSGIMGUI_DECLSPEC
-
 #include <vulkan/vulkan.h>
-#define ImTextureID VkDescriptorSet
+#ifndef VSG_IMGUI_USE_SYSTEM_IMGUI
+#    define ImTextureID VkDescriptorSet
+#endif
 
 #include <vsg/maths/vec2.h>
 #include <vsg/maths/vec4.h>
