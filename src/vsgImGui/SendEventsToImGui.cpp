@@ -48,8 +48,21 @@ SendEventsToImGui::~SendEventsToImGui()
 
 uint32_t SendEventsToImGui::_convertButton(uint32_t button)
 {
-    return button == 1 ? 0 : button == 3 ? 1
-                                         : button;
+    // Map a vsg button number to an ImGuiMouseButton_ index. The Win32 backend reports
+    // back/forward as buttons 4/5, while xcb delivers them as 8/9 (4-7 are the scroll
+    // wheel on X11). Anything ImGui has no slot for maps to ImGuiMouseButton_COUNT and
+    // must not be passed to AddMouseButtonEvent, which asserts on out-of-range buttons.
+    switch (button)
+    {
+    case 1: return ImGuiMouseButton_Left;
+    case 2: return ImGuiMouseButton_Middle;
+    case 3: return ImGuiMouseButton_Right;
+    case 4:
+    case 8: return 3; // X1 / back
+    case 5:
+    case 9: return 4; // X2 / forward
+    default: return ImGuiMouseButton_COUNT;
+    }
 }
 
 void SendEventsToImGui::_initKeymap()
@@ -172,7 +185,7 @@ void SendEventsToImGui::apply(vsg::ButtonPressEvent& buttonPress)
     {
         uint32_t button = _convertButton(buttonPress.button);
         io.AddMousePosEvent(static_cast<float>(buttonPress.x), static_cast<float>(buttonPress.y));
-        io.AddMouseButtonEvent(button, true);
+        if (button < ImGuiMouseButton_COUNT) io.AddMouseButtonEvent(button, true);
 
         buttonPress.handled = true;
     }
@@ -189,7 +202,7 @@ void SendEventsToImGui::apply(vsg::ButtonReleaseEvent& buttonRelease)
     {
         uint32_t button = _convertButton(buttonRelease.button);
         io.AddMousePosEvent(static_cast<float>(buttonRelease.x), static_cast<float>(buttonRelease.y));
-        io.AddMouseButtonEvent(button, false);
+        if (button < ImGuiMouseButton_COUNT) io.AddMouseButtonEvent(button, false);
 
         buttonRelease.handled = true;
     }
